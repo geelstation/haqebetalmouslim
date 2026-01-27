@@ -1,0 +1,438 @@
+.center-panel {
+  background-color: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+
+.expanded-player-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.cassette-header {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.cassette-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin: 0;
+  direction: rtl;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.cassette-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.cassette-items-count {
+  font-size: 14px;
+  color: var(--text-secondary);
+  padding: 4px 12px;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* زر تحميل الشريط كاملاً */
+.download-cassette-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-arabic);
+  direction: rtl;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+.download-cassette-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.download-cassette-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.download-cassette-btn.downloading {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.download-cassette-btn .spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* مؤشر الشريط المحمل */
+.downloaded-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 12px;
+  color: #10b981;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  font-family: var(--font-arabic);
+  direction: rtl;
+}
+
+.user-profile-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(var(--accent-rgb), 0.1);
+  border: 1px solid rgba(var(--accent-rgb), 0.3);
+  border-radius: 12px;
+  color: var(--accent-color);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-arabic);
+  direction: rtl;
+  white-space: nowrap;
+}
+
+.user-profile-link:hover {
+  background: rgba(var(--accent-rgb), 0.2);
+  border-color: var(--accent-color);
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .cassette-header {
+    padding: var(--spacing-sm);
+  }
+  .cassette-title {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .cassette-title {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 800px) {
+  .cassette-title {
+    font-size: 13px;
+  }
+}
+
+/* Duplicate removed - already defined above */
+
+@media (max-width: 1200px) {
+  .cassette-items-count {
+    font-size: 12px;
+    padding: 3px 10px;
+  }
+  
+  .user-profile-link {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 800px) {
+  .cassette-items-count {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+  
+  .user-profile-link {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+}
+
+.cassette-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-tertiary);
+  font-size: 14px;
+  padding: var(--spacing-md);
+  text-align: center;
+}
+
+@media (max-width: 1000px) {
+  .empty-state {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 800px) {
+  .empty-state {
+    font-size: 12px;
+  }
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border-color);
+  padding: var(--spacing-sm);
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: var(--radius-sm);
+  min-height: 40px;
+}
+
+@media (max-width: 1200px) {
+  .item-row {
+    padding: 6px var(--spacing-sm);
+    min-height: 36px;
+  }
+}
+
+@media (max-width: 800px) {
+  .item-row {
+    padding: 5px var(--spacing-xs);
+    min-height: 32px;
+    gap: 6px;
+  }
+}
+
+.item-row:hover {
+  background: var(--bg-tertiary);
+}
+
+.item-row.active {
+  background: linear-gradient(90deg, var(--accent-color) 0%, rgba(106, 13, 173, 0.1) 100%);
+  border-right: 3px solid var(--accent-color);
+}
+
+.item-row.playing {
+  background: linear-gradient(90deg, #10b981 0%, rgba(16, 185, 129, 0.1) 100%);
+  border-right: 3px solid #10b981;
+}
+
+/* زر إضافة لقائمة - صغير وبسيط */
+.add-to-playlist-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  opacity: 0;
+  margin-right: auto;
+}
+
+.item-row:hover .add-to-playlist-btn {
+  opacity: 1;
+}
+
+.add-to-playlist-btn:hover {
+  background: var(--bg-primary);
+  color: var(--accent-color);
+  transform: scale(1.1);
+}
+
+.item-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+@media (max-width: 1200px) {
+  .item-number {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 800px) {
+  .item-number {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+  }
+}
+
+.item-row.active .item-number,
+.item-row.playing .item-number {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.item-title {
+  flex: 1;
+  text-align: right;
+  color: var(--text-primary);
+  direction: rtl;
+  font-weight: 500;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+@media (max-width: 1200px) {
+  .item-title {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 800px) {
+  .item-title {
+    font-size: 12px;
+  }
+}
+
+.item-row.active .item-title,
+.item-row.playing .item-title {
+  color: white;
+  font-weight: 600;
+}
+
+.item-play-icon {
+  color: var(--accent-color);
+  font-size: 14px;
+  flex-shrink: 0;
+  animation: iconPulse 1.5s ease-in-out infinite;
+}
+
+.item-row.playing .item-play-icon {
+  color: #10b981;
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.tree-node.expandable {
+  font-weight: 600;
+}
+
+.expand-icon {
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: transform 0.2s;
+}
+
+.node-icon {
+  font-size: 16px;
+  color: var(--accent-color);
+  flex-shrink: 0;
+}
+
+.tree-node.active .node-icon {
+  color: white;
+}
+
+.node-label {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.tree-node.active .node-label {
+  color: white;
+}
+
+.surah-number {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  background-color: var(--bg-hover);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.tree-node.active .surah-number {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.tree-children {
+  margin-right: var(--spacing-lg);
+  margin-top: var(--spacing-xs);
+}
+
+.tree-node.child {
+  font-size: 13px;
+  padding: var(--spacing-xs) var(--spacing-md);
+}
+
+.tree-node.child .node-icon {
+  font-size: 14px;
+}

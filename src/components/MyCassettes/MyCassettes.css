@@ -1,0 +1,508 @@
+.my-cassettes {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+  background: var(--bg-primary);
+}
+
+.my-cassettes-header {
+  margin-bottom: var(--spacing-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.header-content {
+  flex: 1;
+  text-align: center;
+}
+
+.my-cassettes-header h1 {
+  color: var(--text-primary);
+  font-size: 28px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.share-my-cassettes-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.share-my-cassettes-btn:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+@media (max-width: 768px) {
+  .my-cassettes-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .share-my-cassettes-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.access-denied, .loading, .empty-state {
+  text-align: center;
+  padding: var(--spacing-xl);
+  margin-top: 100px;
+}
+
+.access-denied h2 {
+  color: #ef4444;
+  font-size: 24px;
+  margin-bottom: var(--spacing-md);
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  font-size: 18px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.hint {
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+/* ===================================================
+   شبكة الأشرطة - تصميم الكاسيت الحقيقي
+   =================================================== */
+
+.cassettes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--spacing-xl);
+  padding: var(--spacing-md);
+  row-gap: 120px; /* مسافة كبيرة جداً لتجنب التداخل مع الأزرار */
+  column-gap: 32px;
+}
+
+/* ===================================================
+   بطاقة الكاسيت - تصميم واقعي 3D
+   =================================================== */
+
+.my-cassette-card {
+  position: relative;
+  width: 100%;
+  max-width: 240px;
+  margin: 0 auto;
+  margin-bottom: 60px; /* مسافة إضافية أسفل كل كارت */
+  padding-bottom: 20px; /* مسافة داخلية */
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.my-cassette-card:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+/* مؤشر الحالة */
+.cassette-status-badge {
+  position: absolute;
+  top: -12px;
+  right: 8px;
+  z-index: 10;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  font-family: var(--font-arabic);
+}
+
+.status-badge.approved {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.status-badge.pending {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+}
+
+.status-badge.rejected {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+/* ===================================================
+   جسم الكاسيت - تصميم واقعي
+   =================================================== */
+
+.cassette-body {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3.2 / 2;
+  background: var(--cassette-body);
+  border-radius: 8px;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+/* المسامير */
+.screw {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #555 0%, #333 50%, #222 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset 0 1px 2px rgba(0, 0, 0, 0.8),
+    0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.screw::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.screw-top-left { top: 6px; left: 6px; }
+.screw-top-right { top: 6px; right: 6px; }
+.screw-bottom-left { bottom: 6px; left: 6px; }
+.screw-bottom-right { bottom: 6px; right: 6px; }
+.screw-center { 
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+}
+
+/* نافذة البكرات */
+.cassette-window {
+  position: absolute;
+  top: 20%;
+  left: 10%;
+  right: 10%;
+  height: 35%;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* البكرات */
+.reel {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 50%, #000 100%);
+  border: 2px solid #333;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.5),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.reel-hub {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: #222;
+  border-radius: 50%;
+  border: 1px solid #444;
+}
+
+.reel-teeth {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  background: 
+    repeating-conic-gradient(
+      from 0deg,
+      #1a1a1a 0deg 30deg,
+      #0a0a0a 30deg 60deg
+    );
+  border-radius: 50%;
+  opacity: 0.8;
+}
+
+/* خط الشريط */
+.tape-line {
+  flex: 1;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(139, 92, 46, 0.3) 10%,
+    rgba(139, 92, 46, 0.6) 50%,
+    rgba(139, 92, 46, 0.3) 90%,
+    transparent 100%
+  );
+  margin: 0 4px;
+}
+
+/* ملصق الكاسيت */
+.cassette-label {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 6px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.label-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-arabic);
+}
+
+.label-subtitle {
+  font-size: 10px;
+  color: #666;
+  margin: 2px 0 0 0;
+  font-family: var(--font-arabic);
+}
+
+/* فتحة الشريط السفلية */
+.cassette-bottom-slot {
+  position: absolute;
+  bottom: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 8px;
+  background: linear-gradient(to bottom, 
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  border-radius: 2px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ===================================================
+   البيانات الوصفية والإحصائيات
+   =================================================== */
+
+.cassette-metadata {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.analytics-row {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  align-items: center;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-family: var(--font-arabic);
+}
+
+.stat svg {
+  color: var(--accent-color);
+}
+
+.rejection-reason {
+  padding: var(--spacing-sm);
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid #ef4444;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  margin-top: var(--spacing-sm);
+  font-family: var(--font-arabic);
+}
+
+.rejection-reason strong {
+  color: #ef4444;
+}
+
+/* ===================================================
+   أزرار التحكم
+   =================================================== */
+
+.cassette-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.cassette-actions button {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-arabic);
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.edit-btn:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+}
+
+.delete-btn:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* ===================================================
+   Responsive
+   =================================================== */
+
+@media (max-width: 1400px) {
+  .cassettes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  
+  .my-cassette-card {
+    max-width: 220px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .cassettes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  .my-cassette-card {
+    max-width: 200px;
+  }
+  
+  .label-title {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .cassettes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  }
+  
+  .my-cassette-card {
+    max-width: 190px;
+  }
+}
+
+@media (max-width: 800px) {
+  .cassettes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+  
+  .my-cassette-card {
+    max-width: 180px;
+  }
+  
+  .reel {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .reel-hub {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .reel-teeth {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cassettes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+  
+  .my-cassette-card {
+    max-width: 160px;
+  }
+  
+  .label-title {
+    font-size: 10px;
+  }
+  
+  .label-subtitle {
+    font-size: 9px;
+  }
+}

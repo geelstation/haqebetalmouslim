@@ -1,0 +1,108 @@
+{
+  "name": "haqebetalmouslim",
+  "version": "2.1.0",
+  "description": "حقيبة المسلم - تطبيق متكامل للقرآن الكريم والمحتوى الإسلامي مع دعم كامل للعربية و RTL",
+  "homepage": "https://geelstation.github.io/haqebetalmouslim",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/geelstation/haqebetalmouslim.git"
+  },
+  "bugs": {
+    "url": "https://github.com/geelstation/haqebetalmouslim/issues"
+  },
+  "main": "src/electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "concurrently \"npm run dev:react\" \"wait-on http://localhost:3000 && electron .\"",
+    "dev:react": "vite",
+    "build": "vite build",
+    "build:electron": "npm run build && electron-builder",
+    "build:mac": "npm run build && electron-builder --mac",
+    "build:win": "npm run build && electron-builder --win",
+    "build:linux": "npm run build && electron-builder --linux",
+    "build:all": "npm run build && electron-builder -mwl"
+  },
+  "keywords": [
+    "quran",
+    "islamic",
+    "arabic",
+    "rtl",
+    "electron",
+    "react"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^8.2.2",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "vite": "^5.0.11",
+    "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "firebase": "^12.8.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.0.1"
+  },
+  "build": {
+    "appId": "com.quran.desktop",
+    "productName": "حقيبة المسلم",
+    "files": [
+      "dist/**/*",
+      "src/electron/**/*"
+    ],
+    "directories": {
+      "icon": "build/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "حقيبة المسلم"
+    }
+  }
+}
