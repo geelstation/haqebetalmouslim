@@ -66,12 +66,9 @@ function AudioPlayer({
         // تحميل البيانات دون التشغيل التلقائي
         audioRef.current.load();
         
-        // التشغيل فقط إذا كان المستخدم قد ضغط زر التشغيل مسبقاً
+        // التشغيل فوراً إذا كان المستخدم قد ضغط زر التشغيل مسبقاً
         if (isPlaying && autoPlay) {
-          // استخدام timeout قصير للسماح بتحميل البيانات الوصفية
-          setTimeout(() => {
-            audioRef.current?.play().catch(err => console.error('خطأ في التشغيل:', err));
-          }, 100);
+          audioRef.current?.play().catch(err => console.error('خطأ في التشغيل:', err));
         }
       }
     }
@@ -225,7 +222,8 @@ function AudioPlayer({
     <div className={`audio-player ${isExpanded ? 'expanded' : ''}`}>
       {/* مشغل الصوت المخفي */}
       <audio 
-        ref={audioRef} 
+        ref={audioRef}
+        preload="auto"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onEnded={() => {
