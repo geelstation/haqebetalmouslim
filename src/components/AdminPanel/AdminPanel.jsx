@@ -28,6 +28,90 @@ function AdminPanel({ isAdmin, currentUser }) {
   const [isEditingMessage, setIsEditingMessage] = useState(false);
   const [stats, setStats] = useState({ totalVisits: 0, uniqueVisitors: 0, onlineNow: 0 });
 
+  // دالة تعريب النصوص
+  const translateToArabic = (text) => {
+    const translations = {
+      // الدول
+      'Egypt': 'مصر',
+      'United States': 'الولايات المتحدة',
+      'Yemen': 'اليمن',
+      'Saudi Arabia': 'السعودية',
+      'United Arab Emirates': 'الإمارات',
+      'Kuwait': 'الكويت',
+      'Jordan': 'الأردن',
+      'Palestine': 'فلسطين',
+      'Lebanon': 'لبنان',
+      'Syria': 'سوريا',
+      'Iraq': 'العراق',
+      'Qatar': 'قطر',
+      'Bahrain': 'البحرين',
+      'Oman': 'عمان',
+      'Morocco': 'المغرب',
+      'Algeria': 'الجزائر',
+      'Tunisia': 'تونس',
+      'Libya': 'ليبيا',
+      'Sudan': 'السودان',
+      'Unknown': 'غير معروف',
+      
+      // المدن المصرية
+      'Alexandria': 'الإسكندرية',
+      'Cairo': 'القاهرة',
+      'Giza': 'الجيزة',
+      'Ash-Shaykh Zayid': 'الشيخ زايد',
+      'Alexandria Governorate': 'محافظة الإسكندرية',
+      'Cairo Governorate': 'محافظة القاهرة',
+      
+      // المدن الأمريكية
+      'Ashburn': 'أشبورن',
+      'Boardman': 'بوردمان',
+      'Virginia': 'فيرجينيا',
+      'Oregon': 'أوريغون',
+      
+      // المدن اليمنية
+      'Sanaa': 'صنعاء',
+      'Amanat Alasimah': 'أمانة العاصمة',
+      
+      // الأجهزة
+      'Desktop': 'كمبيوتر',
+      'Mobile': 'موبايل',
+      'Tablet': 'تابلت',
+      
+      // أنظمة التشغيل
+      'Windows': 'ويندوز',
+      'macOS': 'ماك',
+      'Linux': 'لينكس',
+      'Android': 'أندرويد',
+      'iOS': 'آيفون',
+      
+      // المتصفحات
+      'Chrome': 'كروم',
+      'Firefox': 'فايرفوكس',
+      'Safari': 'سفاري',
+      'Edge': 'إيدج',
+      'Opera': 'أوبرا',
+      
+      // المناطق الزمنية
+      'Africa/Cairo': 'القاهرة',
+      'Asia/Aden': 'عدن',
+      'America/New_York': 'نيويورك',
+      'America/Los_Angeles': 'لوس أنجلوس',
+      'Europe/London': 'لندن',
+      'Asia/Dubai': 'دبي',
+      'Asia/Riyadh': 'الرياض',
+      
+      // العملات
+      'EGP': 'جنيه مصري',
+      'USD': 'دولار أمريكي',
+      'SAR': 'ريال سعودي',
+      'AED': 'درهم إماراتي',
+      'YER': 'ريال يمني',
+      'EUR': 'يورو',
+      'GBP': 'جنيه استرليني'
+    };
+    
+    return translations[text] || text;
+  };
+
   // قائمة الأيقونات الإسلامية المتاحة
   const iconOptions = [
     { icon: '☪', name: 'هلال ونجمة' },
@@ -255,7 +339,7 @@ function AdminPanel({ isAdmin, currentUser }) {
             <div className="country-list">
               {stats.topCountries.map((item, idx) => (
                 <div key={idx} className="country-item">
-                  <span className="country-name">{item.country}</span>
+                  <span className="country-name">{translateToArabic(item.country)}</span>
                   <span className="country-count">{item.count} زائر</span>
                 </div>
               ))}
@@ -268,12 +352,16 @@ function AdminPanel({ isAdmin, currentUser }) {
           <div className="cities-stats">
             <h3>🏙️ الزوار حسب المدينة</h3>
             <div className="city-list">
-              {stats.topCities.map((item, idx) => (
-                <div key={idx} className="city-item">
-                  <span className="city-name">{item.location}</span>
-                  <span className="city-count">{item.count} زائر</span>
-                </div>
-              ))}
+              {stats.topCities.map((item, idx) => {
+                const [city, country] = item.location.split(', ');
+                const arabicLocation = `${translateToArabic(city)}، ${translateToArabic(country)}`;
+                return (
+                  <div key={idx} className="city-item">
+                    <span className="city-name">{arabicLocation}</span>
+                    <span className="city-count">{item.count} زائر</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -285,7 +373,7 @@ function AdminPanel({ isAdmin, currentUser }) {
             <div className="region-list">
               {stats.topRegions.map((item, idx) => (
                 <div key={idx} className="region-item">
-                  <span className="region-name">{item.region}</span>
+                  <span className="region-name">{translateToArabic(item.region)}</span>
                   <span className="region-count">{item.count} زائر</span>
                 </div>
               ))}
@@ -300,7 +388,7 @@ function AdminPanel({ isAdmin, currentUser }) {
             <div className="device-list">
               {stats.topDevices.map((item, idx) => (
                 <div key={idx} className="device-item">
-                  <span className="device-name">{item.device}</span>
+                  <span className="device-name">{translateToArabic(item.device)}</span>
                   <span className="device-count">{item.count} زائر</span>
                 </div>
               ))}
@@ -315,7 +403,7 @@ function AdminPanel({ isAdmin, currentUser }) {
             <div className="os-list">
               {stats.topOS.map((item, idx) => (
                 <div key={idx} className="os-item">
-                  <span className="os-name">{item.os}</span>
+                  <span className="os-name">{translateToArabic(item.os)}</span>
                   <span className="os-count">{item.count} زائر</span>
                 </div>
               ))}
@@ -330,7 +418,7 @@ function AdminPanel({ isAdmin, currentUser }) {
             <div className="browser-list">
               {stats.topBrowsers.map((item, idx) => (
                 <div key={idx} className="browser-item">
-                  <span className="browser-name">{item.browser}</span>
+                  <span className="browser-name">{translateToArabic(item.browser)}</span>
                   <span className="browser-count">{item.count} زائر</span>
                 </div>
               ))}
@@ -345,7 +433,7 @@ function AdminPanel({ isAdmin, currentUser }) {
             <div className="timezone-list">
               {stats.topTimezones.map((item, idx) => (
                 <div key={idx} className="timezone-item">
-                  <span className="timezone-name">{item.timezone}</span>
+                  <span className="timezone-name">{translateToArabic(item.timezone)}</span>
                   <span className="timezone-count">{item.count} زائر</span>
                 </div>
               ))}
@@ -360,7 +448,7 @@ function AdminPanel({ isAdmin, currentUser }) {
             <div className="currency-list">
               {stats.topCurrencies.map((item, idx) => (
                 <div key={idx} className="currency-item">
-                  <span className="currency-name">{item.currency}</span>
+                  <span className="currency-name">{translateToArabic(item.currency)}</span>
                   <span className="currency-count">{item.count} زائر</span>
                 </div>
               ))}
