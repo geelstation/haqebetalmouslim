@@ -171,13 +171,24 @@ export async function startTrackingPresence(user) {
     const snap = await getDoc(presenceRef);
     if (snap.exists()) {
       const existingData = snap.data();
+      const isNewSession = !sessionId;
+      const newVisitCount = (existingData.visitCount || 0) + (isNewSession ? 1 : 0);
+      
+      console.log('🔄 Updating visitor:', {
+        visitorId,
+        existingVisitCount: existingData.visitCount,
+        isNewSession,
+        newVisitCount
+      });
+      
       await setDoc(presenceRef, { 
         ...payload, 
         firstSeen: existingData.firstSeen || new Date(),
-        visitCount: (existingData.visitCount || 0) + (!sessionId ? 1 : 0),
+        visitCount: newVisitCount,
         playHistory: existingData.playHistory || []
       }, { merge: true });
     } else {
+      console.log('✨ New visitor:', visitorId);
       await setDoc(presenceRef, {
         ...payload,
         visitCount: 1
@@ -228,17 +239,12 @@ export async function getStats() {
     const all = allSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     const now = Date.now();
     
-    // جلب عدد الزيارات الكلي
-    let totalVisits = 0;
-    try {
-      const analyticsRef = doc(db, 'analytics', 'counters');
-      const analyticsSnap = await getDoc(analyticsRef);
-      if (analyticsSnap.exists()) {
-        totalVisits = analyticsSnap.data().totalVisits || 0;
-      }
-    } catch (err) {
-      console.warn('Failed to get total visits:', err);
-    }
+    // حساب عدد الزيارات الكلي من مجموع visitCount لكل زائر
+    const totalVisits = all.reduce((sum, visitor) => {
+      return sum + (visitor.visitCount || 1);
+    }, 0);
+    
+    console.log('📊 Total Visits Calculated:', totalVisits, 'from', all.length, 'unique visitors');
     
     // حساب المتواجدين الآن (آخر 10 دقائق)
     const tenMinutesAgo = now - (10 * 60 * 1000);
