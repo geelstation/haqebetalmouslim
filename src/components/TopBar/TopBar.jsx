@@ -7,7 +7,7 @@ import { getAppSettings } from '../../services/settingsService';
 import './TopBar.css';
 
 function TopBar({ onAddCassetteClick }) {
-  const { currentUser, logout, loginWithGoogle, lastAuthError } = useAuth();
+  const { currentUser, logout, loginWithGoogle, isAuthenticating, lastAuthError } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [topBarMessages, setTopBarMessages] = useState(['بسم الله الرحمن الرحيم']);
   const [separatorIcon, setSeparatorIcon] = useState('☪');
@@ -152,10 +152,11 @@ function TopBar({ onAddCassetteClick }) {
             <button 
               className="login-btn"
               onClick={handleLogin}
+              disabled={isAuthenticating}
               title="تسجيل الدخول"
             >
               <FcGoogle className="google-icon" />
-              <span>تسجيل الدخول</span>
+              <span>{isAuthenticating ? 'جاري التسجيل...' : 'تسجيل الدخول'}</span>
             </button>
           )}
         </div>

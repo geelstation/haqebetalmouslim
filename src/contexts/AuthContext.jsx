@@ -11,6 +11,7 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthenticating, setIsAuthenticating] = useState(false); // منع الضغط المزدوج
   const [lastAuthError, setLastAuthError] = useState(null);
 
   // ✅ ضبط استمرارية الجلسة عند التحميل الأول
@@ -67,7 +68,16 @@ export function AuthProvider({ children }) {
 
   // تسجيل دخول بواسطة Google
   const loginWithGoogle = async () => {
+    // منع الضغط المتكرر
+    if (isAuthenticating) {
+      console.warn('⚠️ عملية تسجيل دخول جارية بالفعل');
+      return;
+    }
+
     try {
+      setIsAuthenticating(true);
+      setLastAuthError(null);
+      
       // استخدام لغة الجهاز لواجهة Google
       auth.useDeviceLanguage?.();
 
@@ -76,6 +86,12 @@ export function AuthProvider({ children }) {
       return result.user;
     } catch (error) {
       console.error('خطأ في تسجيل الدخول:', error);
+
+      // تجاهل خطأ cancelled-popup-request (المستخدم أغلق النافذة)
+      if (error?.code === 'auth/cancelled-popup-request') {
+        console.log('ℹ️ تم إلغاء popup القديم لفتح واحد جديد');
+        return;
+      }
 
       // أخطاء شائعة على GitHub Pages: منع النوافذ المنبثقة أو نطاق غير مخوّل
       const code = error?.code || '';
@@ -95,6 +111,8 @@ export function AuthProvider({ children }) {
       }
       // إعادة تمرير الخطأ الأصلي لكي نحصل على code/message في الواجهة
       throw error;
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
@@ -112,6 +130,7 @@ export function AuthProvider({ children }) {
     loginWithGoogle,
     logout,
     loading,
+    isAuthenticating,
     lastAuthError
   };
 
