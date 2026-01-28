@@ -37,8 +37,9 @@ function CenterPanel({
       // نفس الملف - toggle play/pause
       setIsPlaying(!isPlaying);
     } else {
-      // ملف جديد - اختر وشغل
+      // ملف جديد - اختر وشغل فوراً
       setSelectedItem(item);
+      // تأكد من التشغيل الفوري
       setIsPlaying(true);
     }
   };

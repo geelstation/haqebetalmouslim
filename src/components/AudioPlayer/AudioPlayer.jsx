@@ -45,6 +45,9 @@ function AudioPlayer({
       const audioUrl = selectedAyah.audioUrl || selectedAyah.src;
       
       if (audioUrl) {
+        // إيقاف أي تشغيل حالي
+        audioRef.current.pause();
+        
         try {
           // التحقق من وجود نسخة محملة محلياً
           const localPath = getLocalPath(audioUrl);
@@ -65,16 +68,33 @@ function AudioPlayer({
           }
         }
         
-        // تحميل البيانات دون التشغيل التلقائي
+        // تحميل الملف
         audioRef.current.load();
         
-        // التشغيل فوراً إذا كان المستخدم قد ضغط زر التشغيل مسبقاً
-        if (isPlaying && autoPlay) {
-          audioRef.current?.play().catch(err => console.error('خطأ في التشغيل:', err));
+        // 🎯 إذا كان isPlaying = true، شغّل فوراً
+        if (isPlaying) {
+          // استخدام timeout صغير جداً للسماح بتحميل metadata
+          const playTimeout = setTimeout(() => {
+            if (audioRef.current) {
+              const playPromise = audioRef.current.play();
+              if (playPromise !== undefined) {
+                playPromise
+                  .then(() => {
+                    console.log('✅ بدأ التشغيل:', selectedAyah.title);
+                  })
+                  .catch(err => {
+                    console.error('❌ فشل التشغيل التلقائي:', err);
+                    // قد يكون بسبب سياسة المتصفح - المستخدم يحتاج تفاعل
+                  });
+              }
+            }
+          }, 50); // 50ms فقط - شبه فوري
+          
+          return () => clearTimeout(playTimeout);
         }
       }
     }
-  }, [selectedAyah, isPlaying, autoPlay]);
+  }, [selectedAyah, isPlaying]);
 
   // 🚀 التحميل المسبق للملف التالي لتشغيل فوري
   useEffect(() => {
