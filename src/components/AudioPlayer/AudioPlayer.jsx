@@ -27,7 +27,9 @@ function AudioPlayer({
   const [sleepTimer, setSleepTimer] = useState(null); // مؤقت النوم
   const [sleepTimeLeft, setSleepTimeLeft] = useState(0); // الوقت المتبقي
   const [showSleepMenu, setShowSleepMenu] = useState(false); // قائمة المؤقت
+  const [isBuffering, setIsBuffering] = useState(false); // حالة التحميل
   const audioRef = useRef(null);
+  const preloadAudioRef = useRef(null); // للتحميل المسبق للملف التالي
   const sleepTimerRef = useRef(null);
 
   // تمرير ref للخارج لاستخدامها في الاختصارات
@@ -73,6 +75,27 @@ function AudioPlayer({
       }
     }
   }, [selectedAyah, isPlaying, autoPlay]);
+
+  // 🚀 التحميل المسبق للملف التالي لتشغيل فوري
+  useEffect(() => {
+    if (selectedCassette?.items && selectedAyah && sequentialPlay) {
+      const currentIndex = selectedCassette.items.findIndex(
+        item => item.id === selectedAyah.id || item.title === selectedAyah.title
+      );
+      
+      if (currentIndex !== -1 && currentIndex < selectedCassette.items.length - 1) {
+        const nextItem = selectedCassette.items[currentIndex + 1];
+        const nextUrl = nextItem.audioUrl || nextItem.src;
+        
+        if (nextUrl && preloadAudioRef.current) {
+          // تحميل الملف التالي في الخلفية
+          preloadAudioRef.current.src = nextUrl;
+          preloadAudioRef.current.load();
+          console.log('🔄 تحميل مسبق للملف التالي:', nextItem.title);
+        }
+      }
+    }
+  }, [selectedAyah, selectedCassette, sequentialPlay]);
 
   // التحكم في التشغيل/الإيقاف
   useEffect(() => {
@@ -220,12 +243,15 @@ function AudioPlayer({
 
   return (
     <div className={`audio-player ${isExpanded ? 'expanded' : ''}`}>
-      {/* مشغل الصوت المخفي */}
+      {/* مشغل الصوت الرئيسي */}
       <audio 
         ref={audioRef}
         preload="auto"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
+        onWaiting={() => setIsBuffering(true)}
+        onCanPlayThrough={() => setIsBuffering(false)}
+        onPlaying={() => setIsBuffering(false)}
         onEnded={() => {
           if (sequentialPlay && onNext) {
             onNext();
@@ -235,6 +261,9 @@ function AudioPlayer({
           }
         }}
       />
+      
+      {/* تحميل مسبق للملف التالي (مخفي) */}
+      <audio ref={preloadAudioRef} preload="auto" style={{ display: 'none' }} />
       
       {/* زر التكبير/التصغير */}
       {onToggleExpand && (

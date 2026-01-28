@@ -94,28 +94,46 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(cacheFirstStrategy(request));
 });
 
-// 🎵 استراتيجية الملفات الصوتية (Cache then Network)
+// 🎵 استراتيجية الملفات الصوتية (Cache First للسرعة القصوى)
 async function audioFetchStrategy(request) {
   try {
     const cache = await caches.open(AUDIO_CACHE_NAME);
     const cachedResponse = await cache.match(request);
     
+    // أولوية قصوى للـ cache للتشغيل الفوري
     if (cachedResponse) {
-      console.log('🎵 Audio: Serving from cache:', request.url);
+      console.log('⚡ Audio: Instant play from cache:', request.url);
       return cachedResponse;
     }
     
-    // تحميل من الشبكة وحفظ في Cache
-    const networkResponse = await fetch(request);
+    console.log('📥 Audio: Downloading and caching:', request.url);
+    
+    // تحميل من الشبكة مع timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 ثانية max
+    
+    const networkResponse = await fetch(request, {
+      signal: controller.signal,
+      cache: 'force-cache' // استخدام cache المتصفح
+    });
+    
+    clearTimeout(timeoutId);
     
     if (networkResponse.ok) {
-      console.log('📥 Audio: Caching new audio file:', request.url);
+      // حفظ فوري في cache للمرات القادمة
       cache.put(request, networkResponse.clone());
     }
     
     return networkResponse;
   } catch (error) {
     console.error('❌ Audio fetch failed:', error);
+    
+    // محاولة الحصول على أي نسخة من cache
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
     return new Response('Audio not available offline', { 
       status: 503, 
       statusText: 'Service Unavailable' 
