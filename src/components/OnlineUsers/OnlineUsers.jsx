@@ -85,14 +85,112 @@ function OnlineUsers() {
     return `منذ ${diffHours} ساعة`;
   };
 
+  const translateToArabic = (text) => {
+    const translations = {
+      // الدول
+      'Egypt': 'مصر',
+      'United States': 'الولايات المتحدة',
+      'Yemen': 'اليمن',
+      'Saudi Arabia': 'السعودية',
+      'United Arab Emirates': 'الإمارات',
+      'Kuwait': 'الكويت',
+      'Jordan': 'الأردن',
+      'Palestine': 'فلسطين',
+      'Lebanon': 'لبنان',
+      'Syria': 'سوريا',
+      'Iraq': 'العراق',
+      'Qatar': 'قطر',
+      'Bahrain': 'البحرين',
+      'Oman': 'عمان',
+      'Morocco': 'المغرب',
+      'Algeria': 'الجزائر',
+      'Tunisia': 'تونس',
+      'Libya': 'ليبيا',
+      'Sudan': 'السودان',
+      'Unknown': 'غير معروف',
+      
+      // المدن المصرية
+      'Alexandria': 'الإسكندرية',
+      'Cairo': 'القاهرة',
+      'Giza': 'الجيزة',
+      'Ash-Shaykh Zayid': 'الشيخ زايد',
+      'Port Said': 'بورسعيد',
+      'Suez': 'السويس',
+      'Luxor': 'الأقصر',
+      'Aswan': 'أسوان',
+      'Mansoura': 'المنصورة',
+      'Tanta': 'طنطا',
+      'Asyut': 'أسيوط',
+      'Ismailia': 'الإسماعيلية',
+      'Zagazig': 'الزقازيق',
+      'Damietta': 'دمياط',
+      
+      // المدن الأمريكية
+      'Ashburn': 'أشبورن',
+      'Boardman': 'بوردمان',
+      'New York': 'نيويورك',
+      'Los Angeles': 'لوس أنجلوس',
+      'Chicago': 'شيكاغو',
+      'Houston': 'هيوستن',
+      'Phoenix': 'فينيكس',
+      'Philadelphia': 'فيلادلفيا',
+      'San Antonio': 'سان أنطونيو',
+      'San Diego': 'سان دييغو',
+      'Dallas': 'دالاس',
+      'San Jose': 'سان خوسيه',
+      
+      // المدن اليمنية
+      'Sanaa': 'صنعاء',
+      'Aden': 'عدن',
+      'Taiz': 'تعز',
+      'Hodeidah': 'الحديدة',
+      'Ibb': 'إب',
+      
+      // المدن السعودية
+      'Riyadh': 'الرياض',
+      'Jeddah': 'جدة',
+      'Mecca': 'مكة',
+      'Medina': 'المدينة',
+      'Dammam': 'الدمام',
+      'Khobar': 'الخبر',
+      
+      // المدن الإماراتية
+      'Dubai': 'دبي',
+      'Abu Dhabi': 'أبوظبي',
+      'Sharjah': 'الشارقة',
+      'Ajman': 'عجمان',
+      
+      // المدن الأخرى
+      'London': 'لندن',
+      'Paris': 'باريس',
+      'Berlin': 'برلين',
+      'Rome': 'روما',
+      'Madrid': 'مدريد',
+      'Istanbul': 'إسطنبول',
+      'Moscow': 'موسكو',
+      'Tokyo': 'طوكيو',
+      'Beijing': 'بكين',
+      'Seoul': 'سيول',
+      'Mumbai': 'مومباي',
+      'Delhi': 'دلهي',
+      'Karachi': 'كراتشي',
+      'Sydney': 'سيدني',
+      'Melbourne': 'ملبورن',
+      'Toronto': 'تورنتو',
+      'Montreal': 'مونتريال'
+    };
+    
+    return translations[text] || text;
+  };
+
   const getLocationString = (location) => {
     if (!location) return 'غير معروف';
     
     const parts = [];
-    if (location.city) parts.push(location.city);
-    if (location.country) parts.push(location.country);
+    if (location.city) parts.push(translateToArabic(location.city));
+    if (location.country) parts.push(translateToArabic(location.country));
     
-    return parts.length > 0 ? parts.join(', ') : 'غير معروف';
+    return parts.length > 0 ? parts.join('، ') : 'غير معروف';
   };
 
   if (loading) {
