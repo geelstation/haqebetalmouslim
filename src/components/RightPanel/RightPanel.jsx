@@ -215,28 +215,6 @@ function RightPanel({
             ))}
           </div>
         )}
-
-        {/* شريط الأدوات (فلاتر + ترتيب) */}
-        <div className="search-toolbar">
-          <div className="sort-controls">
-            <FaSort />
-            <select 
-              value={sortBy} 
-              onChange={(e) => setSortBy(e.target.value)}
-              className="sort-select"
-            >
-              <option value="date-desc">الأحدث</option>
-              <option value="date-asc">الأقدم</option>
-              <option value="views">الأكثر مشاهدة</option>
-              <option value="downloads">الأكثر تحميلاً</option>
-              <option value="title">أبجدياً</option>
-            </select>
-          </div>
-
-          <div className="results-count">
-            {filteredCassettes.length} {filteredCassettes.length === 1 ? 'شريط' : 'شريط'}
-          </div>
-        </div>
       </div>
 
       <div className="cards-grid">
