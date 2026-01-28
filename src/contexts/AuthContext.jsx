@@ -36,7 +36,8 @@ export function AuthProvider({ children }) {
           uid: user.uid,
           displayName: user.displayName,
           email: user.email,
-          photoURL: user.photoURL
+          photoURL: user.photoURL,
+          isAnonymous: user.isAnonymous || false
         });
       } else {
         console.log('👤 لا يوجد مستخدم مسجل');
