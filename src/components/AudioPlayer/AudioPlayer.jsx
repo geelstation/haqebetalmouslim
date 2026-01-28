@@ -296,6 +296,149 @@ function AudioPlayer({
         </button>
       )}
       
+      {/* وضع التكبير - تصميم احترافي ضخم */}
+      {isExpanded ? (
+        <div className="expanded-player-container">
+          {/* خلفية متدرجة مع blur */}
+          <div className="expanded-background">
+            {selectedCassette?.imageUrl && (
+              <img src={selectedCassette.imageUrl} alt="" className="bg-blur" />
+            )}
+            <div className="bg-overlay"></div>
+          </div>
+          
+          {/* المحتوى الرئيسي */}
+          <div className="expanded-content">
+            {/* صورة الشريط الضخمة */}
+            <div className="expanded-artwork">
+              {selectedCassette?.imageUrl ? (
+                <div className={`artwork-container ${isPlaying ? 'playing' : ''}`}>
+                  <img src={selectedCassette.imageUrl} alt={selectedCassette.title} />
+                  <div className="artwork-glow"></div>
+                  {isPlaying && (
+                    <div className="vinyl-disc rotating">
+                      <div className="vinyl-center"></div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="artwork-placeholder">
+                  <p className="ayah-arabic arabic-text">{selectedAyah?.title}</p>
+                </div>
+              )}
+            </div>
+            
+            {/* معلومات المقطع */}
+            <div className="expanded-info">
+              <h2 className="track-title">{selectedAyah?.title || 'لا يوجد'}</h2>
+              <h3 className="cassette-title">{selectedCassette?.title || ''}</h3>
+              <p className="section-name">{selectedSection?.name || ''}</p>
+            </div>
+            
+            {/* شريط التحكم الضخم */}
+            <div className="expanded-controls">
+              {/* شريط التقدم */}
+              <div className="expanded-progress">
+                <span className="time-current">{formatTime(currentTime)}</span>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="100" 
+                  value={progress}
+                  onChange={handleProgressChange}
+                  className="expanded-slider"
+                  disabled={!selectedAyah}
+                />
+                <span className="time-duration">{formatTime(duration)}</span>
+              </div>
+              
+              {/* أزرار التحكم الرئيسية */}
+              <div className="expanded-buttons">
+                <button 
+                  className="expanded-btn prev-btn" 
+                  onClick={onPrevious}
+                  disabled={!selectedAyah || !onPrevious}
+                  title="السابق"
+                >
+                  <FaStepBackward />
+                </button>
+                
+                <button 
+                  className="expanded-btn play-btn-large" 
+                  onClick={handlePlayPause}
+                  disabled={!selectedAyah}
+                  title={isPlaying ? "إيقاف مؤقت" : "تشغيل"}
+                >
+                  {isPlaying ? <FaPause /> : <FaPlay />}
+                </button>
+                
+                <button 
+                  className="expanded-btn next-btn" 
+                  onClick={onNext}
+                  disabled={!selectedAyah || !onNext}
+                  title="التالي"
+                >
+                  <FaStepForward />
+                </button>
+              </div>
+              
+              {/* أزرار إضافية */}
+              <div className="expanded-extra-controls">
+                <button 
+                  className="extra-btn" 
+                  onClick={handleStop}
+                  disabled={!selectedAyah}
+                  title="إيقاف"
+                >
+                  <FaStop /> <span>إيقاف</span>
+                </button>
+                
+                <div className="speed-control">
+                  <button 
+                    className="extra-btn" 
+                    onClick={() => setShowSpeedMenu(!showSpeedMenu)}
+                    disabled={!selectedAyah}
+                    title="سرعة التشغيل"
+                  >
+                    <FaTachometerAlt /> <span>{playbackRate}x</span>
+                  </button>
+                  {showSpeedMenu && (
+                    <div className="speed-menu">
+                      <button onClick={() => handleSpeedChange(0.5)}>0.5x</button>
+                      <button onClick={() => handleSpeedChange(0.75)}>0.75x</button>
+                      <button onClick={() => handleSpeedChange(1.0)} className="default">1x</button>
+                      <button onClick={() => handleSpeedChange(1.25)}>1.25x</button>
+                      <button onClick={() => handleSpeedChange(1.5)}>1.5x</button>
+                      <button onClick={() => handleSpeedChange(2.0)}>2x</button>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="sleep-timer-control">
+                  <button 
+                    className="extra-btn" 
+                    onClick={() => setShowSleepMenu(!showSleepMenu)}
+                    title="مؤقت النوم"
+                  >
+                    <FaClock /> {sleepTimer && <span>{formatSleepTime(sleepTimeLeft)}</span>}
+                  </button>
+                  {showSleepMenu && (
+                    <div className="sleep-menu">
+                      <button onClick={() => setSleepTimerMinutes(15)}>15 دقيقة</button>
+                      <button onClick={() => setSleepTimerMinutes(30)}>30 دقيقة</button>
+                      <button onClick={() => setSleepTimerMinutes(45)}>45 دقيقة</button>
+                      <button onClick={() => setSleepTimerMinutes(60)}>60 دقيقة</button>
+                      {sleepTimer && <button onClick={() => setSleepTimerMinutes(0)} className="cancel">إلغاء</button>}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+      /* الوضع العادي */
+      <>
       <div className="media-viewer">
         <div className="no-media-placeholder">
           {selectedAyah ? (
@@ -477,8 +620,8 @@ function AudioPlayer({
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </div>      </>
+      )}    </div>
   );
 }
 
