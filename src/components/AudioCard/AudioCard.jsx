@@ -58,6 +58,10 @@ function AudioCard({ cassette, isSelected, isPlaying, onClick }) {
     <div 
       className={`cassette-card ${isSelected ? 'selected' : ''} ${isPlaying && isSelected ? 'playing' : ''}`}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={`شريط ${cassette.reciter || cassette.title}`}
+      onKeyPress={(e) => e.key === 'Enter' && onClick?.()}
     >
       <div className="cassette-body">
         {/* زر المفضلة */}
@@ -95,7 +99,12 @@ function AudioCard({ cassette, isSelected, isPlaying, onClick }) {
           {/* صورة الشريط/الشيخ */}
           {cassette.imageUrl && (
             <div className="cassette-image">
-              <img src={cassette.imageUrl} alt={cassette.title} />
+              <img 
+                src={cassette.imageUrl} 
+                alt={cassette.title}
+                loading="lazy"
+                decoding="async"
+              />
             </div>
           )}
           
@@ -123,4 +132,4 @@ function AudioCard({ cassette, isSelected, isPlaying, onClick }) {
   );
 }
 
-export default AudioCard;
+export default React.memo(AudioCard);

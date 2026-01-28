@@ -50,19 +50,31 @@
 /* Responsive للأزرار */
 @media (max-width: 1200px) {
   .action-btn {
-    padding: 6px 12px;
+    padding: 8px 14px;
     font-size: 13px;
   }
 }
 
 @media (max-width: 800px) {
   .action-btn {
-    padding: 5px 10px;
-    font-size: 12px;
-    gap: 4px;
+    padding: 10px 16px;
+    font-size: 14px;
+    gap: 6px;
+    min-height: 44px; /* حجم أكبر للموبايل للضغط السهل */
   }
   .bottom-actions {
-    gap: var(--spacing-sm);
+    gap: var(--spacing-md);
+  }
+}
+
+@media (max-width: 600px) {
+  .action-btn span {
+    display: none; /* إخفاء النص على الشاشات الصغيرة جداً */
+  }
+  .action-btn {
+    padding: 12px;
+    min-width: 48px;
+    justify-content: center;
   }
 }
 

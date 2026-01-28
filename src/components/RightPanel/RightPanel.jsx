@@ -273,4 +273,4 @@ function RightPanel({
   );
 }
 
-export default RightPanel;
+export default React.memo(RightPanel);

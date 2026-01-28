@@ -3,9 +3,10 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/',
+  base: process.env.NODE_ENV === 'production' ? '/haqebetalmouslim/' : '/',
   server: {
-    port: 3000
+    port: 5173,
+    host: true
   },
   build: {
     outDir: 'dist',

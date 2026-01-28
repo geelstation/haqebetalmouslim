@@ -6,6 +6,7 @@ import { savePlaybackState, getPlaybackState } from './services/storageService';
 import { getCassetteById } from './services/cassetteService';
 import { SECTIONS_DATA } from './data/sectionsData';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import TopBar from './components/TopBar/TopBar';
 import LeftPanel from './components/LeftPanel/LeftPanel';
 import CenterPanel from './components/CenterPanel/CenterPanel';
@@ -348,9 +349,11 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -55,4 +55,4 @@ function LeftPanel({
   );
 }
 
-export default LeftPanel;
+export default React.memo(LeftPanel);

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FaPlus, FaSignOutAlt, FaSignInAlt, FaMoon, FaSun, FaMosque, FaShare } from 'react-icons/fa';
+import { FaPlus, FaSignOutAlt, FaSignInAlt, FaMoon, FaSun, FaMosque } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { getAppSettings } from '../../services/settingsService';
-import { shareSite, showShareFeedback } from '../../services/shareService';
 import './TopBar.css';
 
 function TopBar({ onAddCassetteClick }) {
@@ -87,11 +86,6 @@ function TopBar({ onAddCassetteClick }) {
     }
   };
 
-  const handleShare = async () => {
-    const result = await shareSite();
-    showShareFeedback(result);
-  };
-
   return (
     <div className="top-bar">
       <div className="top-bar-content">
@@ -125,14 +119,6 @@ function TopBar({ onAddCassetteClick }) {
             }
           >
             {theme === 'dark' || theme === 'light' ? <FaMosque /> : <FaMosque />}
-          </button>
-
-          <button 
-            className="share-site-btn"
-            onClick={handleShare}
-            title="مشاركة الموقع"
-          >
-            <FaShare />
           </button>
 
           {currentUser ? (

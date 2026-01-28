@@ -435,4 +435,4 @@ function AudioPlayer({
   );
 }
 
-export default AudioPlayer;
+export default React.memo(AudioPlayer);

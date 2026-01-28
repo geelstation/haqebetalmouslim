@@ -191,4 +191,4 @@ function CenterPanel({
   );
 }
 
-export default CenterPanel;
+export default React.memo(CenterPanel);

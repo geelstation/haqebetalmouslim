@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -20,16 +20,13 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 // ✅ إبقاء الجلسة مفتوحة (لا تسجيل خروج تلقائي)
-auth.setPersistence = async () => {
-  try {
-    const { setPersistence, browserLocalPersistence } = await import('firebase/auth');
-    await setPersistence(auth, browserLocalPersistence);
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
     console.log('✅ تم ضبط الاستمرارية على LOCAL - الجلسة ستبقى مفتوحة');
-  } catch (error) {
+  })
+  .catch((error) => {
     console.warn('⚠️ فشل ضبط الاستمرارية:', error);
-  }
-};
-auth.setPersistence();
+  });
 
 export const googleProvider = new GoogleAuthProvider();
 // تحسين تجربة اختيار الحساب
