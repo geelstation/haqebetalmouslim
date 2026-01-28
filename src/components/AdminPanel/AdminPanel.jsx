@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaCheck, FaTimes, FaEdit, FaEye, FaTrash, FaBullhorn } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaEdit, FaEye, FaTrash, FaBullhorn, FaUsers } from 'react-icons/fa';
 import { 
   getPendingCassettes, 
   getAllCassettes,
@@ -12,6 +12,7 @@ import {
 import { getAppSettings, updateTopBarMessage } from '../../services/settingsService';
 import './AdminPanel.css';
 import { getStats } from '../../services/analyticsService';
+import OnlineUsers from '../OnlineUsers/OnlineUsers';
 
 function AdminPanel({ isAdmin, currentUser }) {
   const [pendingCassettes, setPendingCassettes] = useState([]);
@@ -402,6 +403,16 @@ function AdminPanel({ isAdmin, currentUser }) {
           >
             أشرطتي ({myCassettes.length})
           </button>
+          <button 
+            className={`tab-btn ${viewMode === 'online' ? 'active' : ''}`}
+            onClick={() => setViewMode('online')}
+          >
+            <FaUsers /> المتواجدون الآن
+          </button>
+            onClick={() => setViewMode('mine')}
+          >
+            أشرطتي ({myCassettes.length})
+          </button>
         </div>
       </div>
 
@@ -494,7 +505,9 @@ function AdminPanel({ isAdmin, currentUser }) {
 
       <div className="divider"></div>
 
-      {currentCassettes.length === 0 ? (
+      {viewMode === 'online' ? (
+        <OnlineUsers />
+      ) : currentCassettes.length === 0 ? (
         <div className="no-cassettes">
           <p>✅ لا توجد شرايط</p>
         </div>

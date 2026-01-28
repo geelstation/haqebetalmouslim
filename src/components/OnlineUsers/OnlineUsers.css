@@ -1,0 +1,248 @@
+.online-users-container {
+  padding: 20px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.online-users-loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+}
+
+.online-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.stat-box {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.stat-box.registered {
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.stat-box.anonymous {
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+.stat-box.total {
+  border-color: rgba(33, 150, 243, 0.3);
+}
+
+.stat-icon {
+  font-size: 36px;
+  opacity: 0.8;
+}
+
+.stat-box.registered .stat-icon {
+  color: #4caf50;
+}
+
+.stat-box.anonymous .stat-icon {
+  color: #ffc107;
+}
+
+.stat-box.total .stat-icon {
+  color: #2196f3;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.users-section {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.users-list {
+  display: grid;
+  gap: 12px;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  border-right: 4px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.user-card:hover {
+  transform: translateX(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.user-card.registered {
+  border-right-color: #4caf50;
+}
+
+.user-card.anonymous {
+  border-right-color: #ffc107;
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--border-color);
+}
+
+.anonymous-icon {
+  width: 50px;
+  height: 50px;
+  font-size: 30px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border-radius: 50%;
+}
+
+.user-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.user-email {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.user-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.user-location,
+.user-time {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.user-activity {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: inline-block;
+}
+
+.user-id {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: monospace;
+}
+
+.online-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(76, 175, 80, 0.1);
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .online-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-box {
+    padding: 15px;
+  }
+  
+  .stat-number {
+    font-size: 24px;
+  }
+  
+  .user-card {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: right;
+  }
+  
+  .user-avatar,
+  .anonymous-icon {
+    align-self: center;
+  }
+  
+  .user-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
