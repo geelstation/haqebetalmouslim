@@ -10,25 +10,26 @@ function OnlineUsers() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // الحد الزمني: آخر 5 دقائق = نشط حالياً
-    const fiveMinutesAgo = Timestamp.fromDate(new Date(Date.now() - 5 * 60 * 1000));
+    // الحد الزمني: آخر 10 دقائق = نشط حالياً
+    const tenMinutesAgo = Timestamp.fromDate(new Date(Date.now() - 10 * 60 * 1000));
 
     // الاستماع للمستخدمين المسجلين النشطين
     const registeredQuery = query(
       collection(db, 'presence'),
       where('isOnline', '==', true),
-      where('lastSeen', '>=', fiveMinutesAgo),
-      where('isAnonymous', '==', false),
-      orderBy('lastSeen', 'desc')
+      where('isAnonymous', '==', false)
     );
 
     const unsubscribeRegistered = onSnapshot(
       registeredQuery,
       (snapshot) => {
-        const users = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const users = snapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }))
+          .filter(user => user.lastSeen && user.lastSeen.toDate() >= tenMinutesAgo.toDate())
+          .sort((a, b) => b.lastSeen.toDate() - a.lastSeen.toDate());
         setOnlineUsers(users);
         setLoading(false);
       },
@@ -42,18 +43,19 @@ function OnlineUsers() {
     const anonymousQuery = query(
       collection(db, 'presence'),
       where('isOnline', '==', true),
-      where('lastSeen', '>=', fiveMinutesAgo),
-      where('isAnonymous', '==', true),
-      orderBy('lastSeen', 'desc')
+      where('isAnonymous', '==', true)
     );
 
     const unsubscribeAnonymous = onSnapshot(
       anonymousQuery,
       (snapshot) => {
-        const users = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const users = snapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }))
+          .filter(user => user.lastSeen && user.lastSeen.toDate() >= tenMinutesAgo.toDate())
+          .sort((a, b) => b.lastSeen.toDate() - a.lastSeen.toDate());
         setAnonymousUsers(users);
       },
       (error) => {
