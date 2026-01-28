@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { FaSearch, FaFilter, FaTimes, FaSort } from 'react-icons/fa';
+import { FaSearch, FaTimes, FaSort } from 'react-icons/fa';
 import AudioCard from '../AudioCard/AudioCard';
 import { getApprovedCassettes, getLatestCassettes, getTrendingCassettes, incrementViews } from '../../services/cassetteService';
 import { cacheCassette, getOfflineCache, getFavorites, getCachedCassette } from '../../services/storageService';
@@ -16,7 +16,6 @@ function RightPanel({
   const [searchQuery, setSearchQuery] = useState('');
   const [cassettes, setCassettes] = useState([]);
   const [sortBy, setSortBy] = useState('date-desc'); // الترتيب
-  const [showFilters, setShowFilters] = useState(false); // عرض الفلاتر
   const [suggestions, setSuggestions] = useState([]); // اقتراحات البحث
 
   // تحميل الشرايط من Firestore بشكل فوري
