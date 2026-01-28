@@ -103,21 +103,27 @@ export async function startTrackingPresence(user) {
   const sessionId = sessionStorage.getItem(SESSION_KEY);
   const sessionStartTime = sessionStorage.getItem('sessionStartTime');
   
-  if (!sessionId) {
-    // جلسة جديدة - نزيد عداد الزيارات
+  const isNewSession = !sessionId;
+  if (isNewSession) {
+    // جلسة جديدة
     const newSessionId = generateId();
     sessionStorage.setItem(SESSION_KEY, newSessionId);
     sessionStorage.setItem('sessionStartTime', Date.now().toString());
+    console.log('✨ New session started:', newSessionId);
     
+    // زيادة عداد الزيارات الكلي
     try {
       const analyticsRef = doc(db, 'analytics', 'counters');
       await setDoc(analyticsRef, { 
         totalVisits: increment(1),
         lastVisit: new Date()
       }, { merge: true });
+      console.log('✅ totalVisits incremented in analytics/counters');
     } catch (err) {
-      console.warn('Failed to increment visit counter:', err);
+      console.error('❌ Failed to increment visit counter:', err);
     }
+  } else {
+    console.log('🔄 Existing session:', sessionId);
   }
   
   // جلب الموقع الجغرافي ومعلومات الجهاز
@@ -176,7 +182,6 @@ export async function startTrackingPresence(user) {
     const snap = await getDoc(presenceRef);
     if (snap.exists()) {
       const existingData = snap.data();
-      const isNewSession = !sessionId;
       const newVisitCount = (existingData.visitCount || 0) + (isNewSession ? 1 : 0);
       
       console.log('🔄 Updating visitor:', {
@@ -249,10 +254,36 @@ export async function startTrackingPresence(user) {
 export async function getStats() {
   try {
     console.log('🔍 getStats: بدء جلب البيانات من Firestore...');
+    
+    // 1️⃣ جلب إجمالي الزيارات من analytics/counters
+    let totalVisits = 0;
+    try {
+      const analyticsRef = doc(db, 'analytics', 'counters');
+      const analyticsSnap = await getDoc(analyticsRef);
+      if (analyticsSnap.exists()) {
+        totalVisits = analyticsSnap.data().totalVisits || 0;
+        console.log('✅ totalVisits from analytics/counters:', totalVisits);
+      } else {
+        console.log('⚠️ analytics/counters document does not exist');
+      }
+    } catch (err) {
+      console.error('❌ Failed to get totalVisits from analytics/counters:', err);
+    }
+    
+    // 2️⃣ جلب بيانات الزوار من presence
     const coll = collection(db, PRESENCE_COLLECTION);
     const allSnap = await getDocs(coll);
     const all = allSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     console.log(`📦 getStats: تم جلب ${all.length} زائر من Firestore`);
+    
+    // 3️⃣ Fallback: إذا لم يكن هناك totalVisits، احسبه من visitCount
+    if (totalVisits === 0 && all.length > 0) {
+      totalVisits = all.reduce((sum, visitor) => {
+        const count = visitor.visitCount || 1;
+        return sum + count;
+      }, 0);
+      console.log('🔄 Fallback: totalVisits calculated from visitCount:', totalVisits);
+    }
     
     if (all.length > 0) {
       console.log('👤 عينة من البيانات:', all.slice(0, 2).map(v => ({
@@ -264,14 +295,6 @@ export async function getStats() {
     }
     
     const now = Date.now();
-    
-    // حساب عدد الزيارات الكلي من مجموع visitCount لكل زائر
-    const totalVisits = all.reduce((sum, visitor) => {
-      const count = visitor.visitCount || 1;
-      return sum + count;
-    }, 0);
-    
-    console.log('📊 Total Visits Calculated:', totalVisits, 'from', all.length, 'unique visitors');
     
     // حساب المتواجدين الآن (آخر 10 دقائق)
     const tenMinutesAgo = now - (10 * 60 * 1000);
