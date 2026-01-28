@@ -322,12 +322,61 @@ function AdminPanel({ isAdmin, currentUser }) {
       <div className="admin-header">
         <h1>🎛️ لوحة تحكم الأدمن</h1>
         
-        {/* إحصائيات عامة */}
-        <div className="admin-stats">
-          <div className="stat-item"><strong>📊 إجمالي الزيارات:</strong> {stats.totalVisits || 0}</div>
-          <div className="stat-item"><strong>👥 الزوار الفريدين:</strong> {stats.uniqueVisitors}</div>
-          <div className="stat-item"><strong>🟢 المتواجدون الآن:</strong> {stats.onlineNow}</div>
-          <div className="stat-item"><strong>🎧 يستمعون الآن:</strong> {stats.activeListeners || 0}</div>
+        {/* إحصائيات رئيسية - صف أول */}
+        <div className="main-stats-grid">
+          <div className="main-stat-card visits">
+            <div className="stat-icon">📊</div>
+            <div className="stat-content">
+              <div className="stat-value">{stats.totalVisits || 0}</div>
+              <div className="stat-label">إجمالي الزيارات</div>
+              <div className="stat-hint">كل مرة يفتح حد الموقع</div>
+            </div>
+          </div>
+          
+          <div className="main-stat-card visitors">
+            <div className="stat-icon">👥</div>
+            <div className="stat-content">
+              <div className="stat-value">{stats.uniqueVisitors || 0}</div>
+              <div className="stat-label">زوار فريدين</div>
+              <div className="stat-hint">عدد الأشخاص المختلفين</div>
+            </div>
+          </div>
+          
+          <div className="main-stat-card online">
+            <div className="stat-icon">🟢</div>
+            <div className="stat-content">
+              <div className="stat-value">{stats.onlineNow || 0}</div>
+              <div className="stat-label">متواجدون الآن</div>
+              <div className="stat-hint">آخر 10 دقائق</div>
+            </div>
+          </div>
+          
+          <div className="main-stat-card listening">
+            <div className="stat-icon">🎧</div>
+            <div className="stat-content">
+              <div className="stat-value">{stats.activeListeners || 0}</div>
+              <div className="stat-label">يستمعون الآن</div>
+              <div className="stat-hint">تشغيل مباشر</div>
+            </div>
+          </div>
+          
+          <div className="main-stat-card cassettes">
+            <div className="stat-icon">📼</div>
+            <div className="stat-content">
+              <div className="stat-value">{allCassettes.length || 0}</div>
+              <div className="stat-label">إجمالي الأشرطة</div>
+              <div className="stat-hint">كل الأشرطة المعتمدة</div>
+            </div>
+          </div>
+          
+          <div className="main-stat-card pending">
+            <div className="stat-icon">⏳</div>
+            <div className="stat-content">
+              <div className="stat-value">{pendingCassettes.length || 0}</div>
+              <div className="stat-label">معلقة</div>
+              <div className="stat-hint">تنتظر الموافقة</div>
+            </div>
+          </div>
         </div>
 
         {/* شبكة الإحصائيات التفصيلية */}

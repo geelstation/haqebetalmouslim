@@ -14,8 +14,105 @@
 .admin-header h1 {
   color: var(--text-primary);
   font-size: 28px;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
+
+/* البطاقات الرئيسية */
+.main-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.main-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background: var(--bg-secondary);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.main-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-color), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.main-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.main-stat-card:hover::before {
+  opacity: 1;
+}
+
+.main-stat-card .stat-icon {
+  font-size: 36px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.main-stat-card .stat-content {
+  flex: 1;
+}
+
+.main-stat-card .stat-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--accent-color);
+  line-height: 1.2;
+}
+
+.main-stat-card .stat-label {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.main-stat-card .stat-hint {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ألوان مميزة للبطاقات */
+.main-stat-card.visits { border-color: rgba(33, 150, 243, 0.3); }
+.main-stat-card.visits:hover { border-color: #2196f3; }
+.main-stat-card.visits .stat-value { color: #2196f3; }
+
+.main-stat-card.visitors { border-color: rgba(156, 39, 176, 0.3); }
+.main-stat-card.visitors:hover { border-color: #9c27b0; }
+.main-stat-card.visitors .stat-value { color: #9c27b0; }
+
+.main-stat-card.online { border-color: rgba(76, 175, 80, 0.3); }
+.main-stat-card.online:hover { border-color: #4caf50; }
+.main-stat-card.online .stat-value { color: #4caf50; }
+
+.main-stat-card.listening { border-color: rgba(255, 152, 0, 0.3); }
+.main-stat-card.listening:hover { border-color: #ff9800; }
+.main-stat-card.listening .stat-value { color: #ff9800; }
+
+.main-stat-card.cassettes { border-color: rgba(233, 30, 99, 0.3); }
+.main-stat-card.cassettes:hover { border-color: #e91e63; }
+.main-stat-card.cassettes .stat-value { color: #e91e63; }
+
+.main-stat-card.pending { border-color: rgba(255, 193, 7, 0.3); }
+.main-stat-card.pending:hover { border-color: #ffc107; }
+.main-stat-card.pending .stat-value { color: #ffc107; }
 
 .admin-header p {
   color: var(--accent-color);
