@@ -87,6 +87,18 @@ function OnlineUsers() {
     return `منذ ${diffHours} ساعة`;
   };
 
+  const formatDuration = (seconds) => {
+    if (!seconds || seconds < 0) return '0 ثانية';
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (hours > 0) return `${hours} ساعة و ${minutes} دقيقة`;
+    if (minutes > 0) return `${minutes} دقيقة و ${secs} ثانية`;
+    return `${secs} ثانية`;
+  };
+
   const translateToArabic = (text) => {
     const translations = {
       // الدول
@@ -248,6 +260,7 @@ function OnlineUsers() {
                 <div className="user-details">
                   <div className="user-name">{user.displayName || 'مستخدم'}</div>
                   <div className="user-email">{user.email}</div>
+                  
                   <div className="user-meta">
                     <span className="user-location">
                       <FaMapMarkerAlt /> {getLocationString(user.location)}
@@ -256,13 +269,40 @@ function OnlineUsers() {
                       <FaClock /> {formatTimeAgo(user.lastSeen)}
                     </span>
                   </div>
+                  
+                  {/* عدد الزيارات ومدة الجلسة */}
+                  <div className="user-stats">
+                    <span className="stat-badge">
+                      🔢 زاره {user.visitCount || 1} مرة
+                    </span>
+                    <span className="stat-badge">
+                      ⏱️ {formatDuration(user.sessionDuration || 0)}
+                    </span>
+                  </div>
+                  
+                  {/* الصفحة الحالية */}
                   {user.currentPage && (
                     <div className="user-activity">
                       📄 {user.currentPage}
                     </div>
                   )}
+                  
+                  {/* الشريط الحالي */}
+                  {user.currentlyPlaying && (
+                    <div className="currently-playing">
+                      🎵 <strong>يستمع الآن:</strong> {user.currentlyPlaying.cassetteTitle}
+                      {user.currentlyPlaying.itemTitle && ` - ${user.currentlyPlaying.itemTitle}`}
+                    </div>
+                  )}
+                  
+                  {/* الأكثر استماعاً */}
+                  {user.mostPlayedCassette && (
+                    <div className="most-played">
+                      ⭐ <strong>الأكثر استماعاً:</strong> {user.mostPlayedCassette.title} ({user.mostPlayedCassette.count} مرة)
+                    </div>
+                  )}
                 </div>
-                <div className="online-indicator active"></div>
+                <div className="online-indicator"></div>
               </div>
             ))}
           </div>
@@ -281,6 +321,7 @@ function OnlineUsers() {
                 <FaUserSlash className="anonymous-icon" />
                 <div className="user-details">
                   <div className="user-name">زائر</div>
+                  
                   <div className="user-meta">
                     <span className="user-location">
                       <FaMapMarkerAlt /> {getLocationString(user.location)}
@@ -289,14 +330,42 @@ function OnlineUsers() {
                       <FaClock /> {formatTimeAgo(user.lastSeen)}
                     </span>
                   </div>
+                  
+                  {/* عدد الزيارات ومدة الجلسة */}
+                  <div className="user-stats">
+                    <span className="stat-badge">
+                      🔢 زاره {user.visitCount || 1} مرة
+                    </span>
+                    <span className="stat-badge">
+                      ⏱️ {formatDuration(user.sessionDuration || 0)}
+                    </span>
+                  </div>
+                  
+                  {/* الصفحة الحالية */}
                   {user.currentPage && (
                     <div className="user-activity">
                       📄 {user.currentPage}
                     </div>
                   )}
+                  
+                  {/* الشريط الحالي */}
+                  {user.currentlyPlaying && (
+                    <div className="currently-playing">
+                      🎵 <strong>يستمع الآن:</strong> {user.currentlyPlaying.cassetteTitle}
+                      {user.currentlyPlaying.itemTitle && ` - ${user.currentlyPlaying.itemTitle}`}
+                    </div>
+                  )}
+                  
+                  {/* الأكثر استماعاً */}
+                  {user.mostPlayedCassette && (
+                    <div className="most-played">
+                      ⭐ <strong>الأكثر استماعاً:</strong> {user.mostPlayedCassette.title} ({user.mostPlayedCassette.count} مرة)
+                    </div>
+                  )}
+                  
                   <div className="user-id">ID: {user.id.substring(0, 8)}...</div>
                 </div>
-                <div className="online-indicator active"></div>
+                <div className="online-indicator"></div>
               </div>
             ))}
           </div>

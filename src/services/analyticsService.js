@@ -96,10 +96,13 @@ export async function startTrackingPresence(user) {
   
   // تسجيل زيارة جديدة (كل مرة يفتح الموقع)
   const sessionId = sessionStorage.getItem(SESSION_KEY);
+  const sessionStartTime = sessionStorage.getItem('sessionStartTime');
+  
   if (!sessionId) {
     // جلسة جديدة - نزيد عداد الزيارات
     const newSessionId = generateId();
     sessionStorage.setItem(SESSION_KEY, newSessionId);
+    sessionStorage.setItem('sessionStartTime', Date.now().toString());
     
     try {
       const analyticsRef = doc(db, 'analytics', 'counters');
@@ -116,8 +119,12 @@ export async function startTrackingPresence(user) {
   const location = await getCountryFromIP();
   const deviceInfo = getUserAgentInfo();
   
+  // حساب مدة الجلسة
+  const sessionDuration = sessionStartTime ? Math.floor((Date.now() - parseInt(sessionStartTime)) / 1000) : 0;
+  
   const payload = {
     visitorId,
+    sessionId: sessionId || generateId(),
     userId: user?.uid || null,
     email: user?.email || null,
     displayName: user?.displayName || null,
@@ -155,18 +162,26 @@ export async function startTrackingPresence(user) {
     lastActive: new Date(),
     status: 'online',
     currentPage: window.location.pathname,
-    currentlyPlaying: null
+    sessionDuration: sessionDuration,
+    currentlyPlaying: null,
+    playHistory: []
   };
   
   try {
     const snap = await getDoc(presenceRef);
     if (snap.exists()) {
+      const existingData = snap.data();
       await setDoc(presenceRef, { 
         ...payload, 
-        firstSeen: snap.data().firstSeen || new Date() 
+        firstSeen: existingData.firstSeen || new Date(),
+        visitCount: (existingData.visitCount || 0) + (!sessionId ? 1 : 0),
+        playHistory: existingData.playHistory || []
       }, { merge: true });
     } else {
-      await setDoc(presenceRef, payload, { merge: true });
+      await setDoc(presenceRef, {
+        ...payload,
+        visitCount: 1
+      }, { merge: true });
     }
   } catch (err) {
     console.warn('Presence init failed:', err);
@@ -176,12 +191,16 @@ export async function startTrackingPresence(user) {
   if (heartbeatTimer) clearInterval(heartbeatTimer);
   heartbeatTimer = setInterval(async () => {
     try {
+      const sessionStartTime = sessionStorage.getItem('sessionStartTime');
+      const sessionDuration = sessionStartTime ? Math.floor((Date.now() - parseInt(sessionStartTime)) / 1000) : 0;
+      
       await setDoc(presenceRef, { 
         lastSeen: new Date(),
         lastActive: new Date(), 
         isOnline: true,
         status: 'online',
         currentPage: window.location.pathname,
+        sessionDuration: sessionDuration,
         currentlyPlaying: currentPlaybackData 
       }, { merge: true });
     } catch (err) {
@@ -351,11 +370,52 @@ export async function getStats() {
 }
 
 // تحديث بيانات التشغيل الحالي
-export function updateCurrentPlayback(cassetteTitle, itemTitle) {
+export async function updateCurrentPlayback(cassetteTitle, itemTitle) {
   currentPlaybackData = cassetteTitle ? {
     cassetteTitle,
     itemTitle,
     timestamp: new Date()
   } : null;
+  
+  // تحديث سجل التشغيل في Firestore
+  if (cassetteTitle) {
+    try {
+      const visitorId = getVisitorId();
+      const presenceRef = doc(db, PRESENCE_COLLECTION, visitorId);
+      const snap = await getDoc(presenceRef);
+      
+      if (snap.exists()) {
+        const playHistory = snap.data().playHistory || [];
+        const newPlay = {
+          cassetteTitle,
+          itemTitle,
+          timestamp: new Date()
+        };
+        
+        // إضافة للتاريخ (نحتفظ بآخر 20 تشغيل)
+        const updatedHistory = [newPlay, ...playHistory].slice(0, 20);
+        
+        // حساب الأكثر تشغيلاً
+        const playCount = {};
+        updatedHistory.forEach(play => {
+          playCount[play.cassetteTitle] = (playCount[play.cassetteTitle] || 0) + 1;
+        });
+        
+        const mostPlayed = Object.entries(playCount)
+          .sort((a, b) => b[1] - a[1])[0];
+        
+        await setDoc(presenceRef, {
+          currentlyPlaying: currentPlaybackData,
+          playHistory: updatedHistory,
+          mostPlayedCassette: mostPlayed ? {
+            title: mostPlayed[0],
+            count: mostPlayed[1]
+          } : null
+        }, { merge: true });
+      }
+    } catch (err) {
+      console.warn('Failed to update play history:', err);
+    }
+  }
 }
 
