@@ -162,10 +162,16 @@ function AdminPanel({ isAdmin, currentUser }) {
 
   const loadStats = async () => {
     try {
+      console.log('📊 AdminPanel: جاري تحميل الإحصائيات...');
       const s = await getStats();
+      console.log('📊 AdminPanel: الإحصائيات المستلمة:', {
+        totalVisits: s.totalVisits,
+        uniqueVisitors: s.uniqueVisitors,
+        onlineNow: s.onlineNow
+      });
       setStats(s);
     } catch (e) {
-      console.warn('⚠️ خطأ في تحميل الإحصائيات:', e);
+      console.error('❌ AdminPanel: خطأ في تحميل الإحصائيات:', e);
       setStats({ totalVisits: 0, uniqueVisitors: 0, onlineNow: 0 });
     }
   };

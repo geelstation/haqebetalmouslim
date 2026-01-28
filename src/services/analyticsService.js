@@ -91,8 +91,13 @@ async function getCountryFromIP() {
 }
 
 export async function startTrackingPresence(user) {
+  console.log('🎯 startTrackingPresence called with user:', user?.email || 'Anonymous');
+  
   const visitorId = getVisitorId();
+  console.log('🆔 Visitor ID:', visitorId);
+  
   const presenceRef = doc(db, PRESENCE_COLLECTION, visitorId);
+  console.log('📄 Firestore reference created for:', PRESENCE_COLLECTION + '/' + visitorId);
   
   // تسجيل زيارة جديدة (كل مرة يفتح الموقع)
   const sessionId = sessionStorage.getItem(SESSION_KEY);
@@ -187,15 +192,24 @@ export async function startTrackingPresence(user) {
         visitCount: newVisitCount,
         playHistory: existingData.playHistory || []
       }, { merge: true });
+      
+      console.log('✅ Visitor data updated successfully in Firestore');
     } else {
       console.log('✨ New visitor:', visitorId);
       await setDoc(presenceRef, {
         ...payload,
         visitCount: 1
       }, { merge: true });
+      
+      console.log('✅ New visitor data saved successfully in Firestore');
     }
   } catch (err) {
-    console.warn('Presence init failed:', err);
+    console.error('❌ Presence init failed:', err);
+    console.error('Error details:', {
+      message: err.message,
+      code: err.code,
+      stack: err.stack
+    });
   }
 
   // heartbeat
@@ -234,14 +248,27 @@ export async function startTrackingPresence(user) {
 
 export async function getStats() {
   try {
+    console.log('🔍 getStats: بدء جلب البيانات من Firestore...');
     const coll = collection(db, PRESENCE_COLLECTION);
     const allSnap = await getDocs(coll);
     const all = allSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    console.log(`📦 getStats: تم جلب ${all.length} زائر من Firestore`);
+    
+    if (all.length > 0) {
+      console.log('👤 عينة من البيانات:', all.slice(0, 2).map(v => ({
+        id: v.id,
+        visitCount: v.visitCount,
+        isAnonymous: v.isAnonymous,
+        country: v.country
+      })));
+    }
+    
     const now = Date.now();
     
     // حساب عدد الزيارات الكلي من مجموع visitCount لكل زائر
     const totalVisits = all.reduce((sum, visitor) => {
-      return sum + (visitor.visitCount || 1);
+      const count = visitor.visitCount || 1;
+      return sum + count;
     }, 0);
     
     console.log('📊 Total Visits Calculated:', totalVisits, 'from', all.length, 'unique visitors');
