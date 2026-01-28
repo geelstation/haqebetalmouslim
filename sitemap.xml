@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <!-- Homepage -->
+  <url>
+    <loc>https://geelstation.github.io/haqebetalmouslim/</loc>
+    <lastmod>2026-01-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://geelstation.github.io/haqebetalmouslim/"/>
+  </url>
+  
+  <!-- About Page -->
+  <url>
+    <loc>https://geelstation.github.io/haqebetalmouslim/#/about</loc>
+    <lastmod>2026-01-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Cassettes/Library Page -->
+  <url>
+    <loc>https://geelstation.github.io/haqebetalmouslim/#/library</loc>
+    <lastmod>2026-01-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- My Cassettes Page -->
+  <url>
+    <loc>https://geelstation.github.io/haqebetalmouslim/#/my-cassettes</loc>
+    <lastmod>2026-01-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- My Downloads Page -->
+  <url>
+    <loc>https://geelstation.github.io/haqebetalmouslim/#/my-downloads</loc>
+    <lastmod>2026-01-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- My Playlists Page -->
+  <url>
+    <loc>https://geelstation.github.io/haqebetalmouslim/#/my-playlists</loc>
+    <lastmod>2026-01-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+</urlset>

@@ -1,0 +1,14 @@
+# Robots.txt for حقيبة المسلم
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://geelstation.github.io/haqebetalmouslim/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Disallow sensitive paths (if any)
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#b8983a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c8a850;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- خلفية دائرية -->
+  <circle cx="50" cy="50" r="48" fill="url(#grad)" stroke="#8b7428" stroke-width="2"/>
+  
+  <!-- هلال -->
+  <path d="M 35 30 A 20 20 0 1 1 35 70 A 15 15 0 1 0 35 30 Z" fill="#fff" opacity="0.95"/>
+  
+  <!-- نجمة -->
+  <path d="M 70 35 L 72 42 L 79 42 L 73 46 L 75 53 L 70 49 L 65 53 L 67 46 L 61 42 L 68 42 Z" fill="#fff" opacity="0.95"/>
+  
+  <!-- كتاب مفتوح (قرآن) -->
+  <path d="M 30 55 L 30 80 Q 50 75 70 80 L 70 55 Q 50 60 30 55 Z" fill="#fff" opacity="0.9" stroke="#b8983a" stroke-width="1"/>
+  <line x1="50" y1="55" x2="50" y2="80" stroke="#b8983a" stroke-width="1.5"/>
+  
+  <!-- خطوط تمثل النص -->
+  <line x1="35" y1="62" x2="48" y2="62" stroke="#b8983a" stroke-width="0.8" opacity="0.6"/>
+  <line x1="35" y1="67" x2="48" y2="67" stroke="#b8983a" stroke-width="0.8" opacity="0.6"/>
+  <line x1="35" y1="72" x2="48" y2="72" stroke="#b8983a" stroke-width="0.8" opacity="0.6"/>
+  <line x1="52" y1="62" x2="65" y2="62" stroke="#b8983a" stroke-width="0.8" opacity="0.6"/>
+  <line x1="52" y1="67" x2="65" y2="67" stroke="#b8983a" stroke-width="0.8" opacity="0.6"/>
+  <line x1="52" y1="72" x2="65" y2="72" stroke="#b8983a" stroke-width="0.8" opacity="0.6"/>
+</svg>
