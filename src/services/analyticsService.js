@@ -121,7 +121,15 @@ export async function startTrackingPresence(user) {
     userId: user?.uid || null,
     email: user?.email || null,
     displayName: user?.displayName || null,
+    photoURL: user?.photoURL || null,
+    isAnonymous: !user || user.isAnonymous,
     // معلومات جغرافية
+    location: {
+      ip: location.ip,
+      country: location.country,
+      city: location.city,
+      region: location.region
+    },
     ip: location.ip,
     country: location.country,
     countryCode: location.countryCode,
@@ -141,9 +149,12 @@ export async function startTrackingPresence(user) {
     device: deviceInfo.device,
     userAgent: navigator.userAgent,
     // حالة الزائر
+    isOnline: true,
     firstSeen: new Date(),
+    lastSeen: new Date(),
     lastActive: new Date(),
     status: 'online',
+    currentPage: window.location.pathname,
     currentlyPlaying: null
   };
   
@@ -166,8 +177,11 @@ export async function startTrackingPresence(user) {
   heartbeatTimer = setInterval(async () => {
     try {
       await setDoc(presenceRef, { 
+        lastSeen: new Date(),
         lastActive: new Date(), 
+        isOnline: true,
         status: 'online',
+        currentPage: window.location.pathname,
         currentlyPlaying: currentPlaybackData 
       }, { merge: true });
     } catch (err) {
@@ -178,7 +192,12 @@ export async function startTrackingPresence(user) {
   // mark offline on unload
   window.addEventListener('beforeunload', async () => {
     try {
-      await setDoc(presenceRef, { lastActive: new Date(), status: 'offline' }, { merge: true });
+      await setDoc(presenceRef, { 
+        lastSeen: new Date(),
+        lastActive: new Date(), 
+        isOnline: false,
+        status: 'offline' 
+      }, { merge: true });
     } catch {}
   });
 }
@@ -202,10 +221,12 @@ export async function getStats() {
       console.warn('Failed to get total visits:', err);
     }
     
-    // حساب المتواجدين الآن
+    // حساب المتواجدين الآن (آخر 10 دقائق)
+    const tenMinutesAgo = now - (10 * 60 * 1000);
     const onlineUsers = all.filter(d => {
-      const ts = d.lastActive instanceof Date ? d.lastActive.getTime() : (d.lastActive?.toMillis?.() || 0);
-      return ts && (now - ts) <= ONLINE_THRESHOLD_MS;
+      if (!d.isOnline) return false;
+      const ts = d.lastSeen instanceof Date ? d.lastSeen.getTime() : (d.lastSeen?.toMillis?.() || 0);
+      return ts && (now - ts) <= (10 * 60 * 1000);
     });
     
     // إحصائيات الدول والمدن
