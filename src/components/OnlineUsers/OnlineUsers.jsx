@@ -217,6 +217,7 @@ function OnlineUsers() {
 
   return (
     <div className="online-users-container">
+      {/* إحصائيات ملخصة */}
       <div className="online-stats">
         <div className="stat-box registered">
           <FaUser className="stat-icon" />
@@ -241,6 +242,18 @@ function OnlineUsers() {
             <span className="stat-label">المجموع</span>
           </div>
         </div>
+        
+        <div className="stat-box duration">
+          <FaClock className="stat-icon" />
+          <div className="stat-info">
+            <span className="stat-number">
+              {formatDuration(
+                [...onlineUsers, ...anonymousUsers].reduce((sum, u) => sum + (u.sessionDuration || 0), 0)
+              )}
+            </span>
+            <span className="stat-label">إجمالي مدة الجلسات</span>
+          </div>
+        </div>
       </div>
 
       {/* المستخدمون المسجلون */}
@@ -251,58 +264,150 @@ function OnlineUsers() {
           </h3>
           <div className="users-list">
             {onlineUsers.map((user) => (
-              <div key={user.id} className="user-card registered">
-                <img 
-                  src={user.photoURL || '/default-avatar.png'} 
-                  alt={user.displayName}
-                  className="user-avatar"
-                />
-                <div className="user-details">
-                  <div className="user-name">{user.displayName || 'مستخدم'}</div>
-                  <div className="user-email">{user.email}</div>
-                  
-                  <div className="user-meta">
-                    <span className="user-location">
-                      <FaMapMarkerAlt /> {getLocationString(user.location)}
-                    </span>
-                    <span className="user-time">
-                      <FaClock /> {formatTimeAgo(user.lastSeen)}
-                    </span>
+              <div key={user.id} className="user-card registered detailed">
+                <div className="user-header">
+                  <img 
+                    src={user.photoURL || '/default-avatar.png'} 
+                    alt={user.displayName}
+                    className="user-avatar"
+                  />
+                  <div className="user-basic-info">
+                    <div className="user-name">{user.displayName || 'مستخدم'}</div>
+                    <div className="user-email">{user.email}</div>
                   </div>
-                  
-                  {/* عدد الزيارات ومدة الجلسة */}
-                  <div className="user-stats">
-                    <span className="stat-badge">
-                      🔢 زاره {user.visitCount || 1} مرة
-                    </span>
-                    <span className="stat-badge">
-                      ⏱️ {formatDuration(user.sessionDuration || 0)}
-                    </span>
-                  </div>
-                  
-                  {/* الصفحة الحالية */}
-                  {user.currentPage && (
-                    <div className="user-activity">
-                      📄 {user.currentPage}
+                  <div className="online-indicator"></div>
+                </div>
+                
+                <div className="user-details-grid">
+                  {/* معلومات الموقع */}
+                  <div className="detail-section">
+                    <div className="section-header">
+                      <FaMapMarkerAlt /> الموقع الجغرافي
                     </div>
-                  )}
+                    <div className="section-content">
+                      <div className="detail-item">
+                        <span className="detail-label">الدولة:</span>
+                        <span className="detail-value">{translateToArabic(user.location?.country || user.country || 'غير معروف')}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">المدينة:</span>
+                        <span className="detail-value">{translateToArabic(user.location?.city || user.city || 'غير معروف')}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">المنطقة:</span>
+                        <span className="detail-value">{translateToArabic(user.location?.region || user.region || 'غير معروف')}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">المنطقة الزمنية:</span>
+                        <span className="detail-value">{translateToArabic(user.timezone || 'غير معروف')}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* معلومات الجهاز */}
+                  <div className="detail-section">
+                    <div className="section-header">
+                      📱 الجهاز والمتصفح
+                    </div>
+                    <div className="section-content">
+                      <div className="detail-item">
+                        <span className="detail-label">الجهاز:</span>
+                        <span className="detail-value">{translateToArabic(user.device || 'غير معروف')}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">النظام:</span>
+                        <span className="detail-value">{translateToArabic(user.os || 'غير معروف')}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">المتصفح:</span>
+                        <span className="detail-value">{translateToArabic(user.browser || 'غير معروف')}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* النشاط والإحصائيات */}
+                  <div className="detail-section full-width">
+                    <div className="section-header">
+                      📊 الإحصائيات والنشاط
+                    </div>
+                    <div className="section-content stats-grid">
+                      <div className="stat-item-small">
+                        <div className="stat-icon-small">🔢</div>
+                        <div>
+                          <div className="stat-value-small">{user.visitCount || 1}</div>
+                          <div className="stat-label-small">زيارة</div>
+                        </div>
+                      </div>
+                      <div className="stat-item-small">
+                        <div className="stat-icon-small">⏱️</div>
+                        <div>
+                          <div className="stat-value-small">{formatDuration(user.sessionDuration || 0)}</div>
+                          <div className="stat-label-small">مدة الجلسة</div>
+                        </div>
+                      </div>
+                      <div className="stat-item-small">
+                        <div className="stat-icon-small">🕐</div>
+                        <div>
+                          <div className="stat-value-small">{formatTimeAgo(user.lastSeen)}</div>
+                          <div className="stat-label-small">آخر نشاط</div>
+                        </div>
+                      </div>
+                      <div className="stat-item-small">
+                        <div className="stat-icon-small">📄</div>
+                        <div>
+                          <div className="stat-value-small" style={{fontSize: '11px'}}>{user.currentPage || '/'}</div>
+                          <div className="stat-label-small">الصفحة الحالية</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   
                   {/* الشريط الحالي */}
                   {user.currentlyPlaying && (
-                    <div className="currently-playing">
-                      🎵 <strong>يستمع الآن:</strong> {user.currentlyPlaying.cassetteTitle}
-                      {user.currentlyPlaying.itemTitle && ` - ${user.currentlyPlaying.itemTitle}`}
+                    <div className="detail-section full-width playing-now">
+                      <div className="section-header">
+                        🎵 يستمع الآن
+                      </div>
+                      <div className="currently-playing-details">
+                        <div className="cassette-name">{user.currentlyPlaying.cassetteTitle}</div>
+                        {user.currentlyPlaying.itemTitle && (
+                          <div className="track-name">{user.currentlyPlaying.itemTitle}</div>
+                        )}
+                        <div className="play-time">بدأ منذ {formatTimeAgo(user.currentlyPlaying.timestamp)}</div>
+                      </div>
                     </div>
                   )}
                   
                   {/* الأكثر استماعاً */}
                   {user.mostPlayedCassette && (
-                    <div className="most-played">
-                      ⭐ <strong>الأكثر استماعاً:</strong> {user.mostPlayedCassette.title} ({user.mostPlayedCassette.count} مرة)
+                    <div className="detail-section full-width favorite">
+                      <div className="section-header">
+                        ⭐ الشريط المفضل
+                      </div>
+                      <div className="favorite-details">
+                        <div className="cassette-name">{user.mostPlayedCassette.title}</div>
+                        <div className="play-count">استمع له {user.mostPlayedCassette.count} مرة</div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* تاريخ التشغيل */}
+                  {user.playHistory && user.playHistory.length > 0 && (
+                    <div className="detail-section full-width history">
+                      <div className="section-header">
+                        📜 تاريخ الاستماع ({user.playHistory.length})
+                      </div>
+                      <div className="play-history-list">
+                        {user.playHistory.slice(0, 5).map((play, idx) => (
+                          <div key={idx} className="history-item">
+                            <div className="history-title">{play.cassetteTitle}</div>
+                            <div className="history-time">{formatTimeAgo(play.timestamp)}</div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
-                <div className="online-indicator"></div>
               </div>
             ))}
           </div>
@@ -317,55 +422,146 @@ function OnlineUsers() {
           </h3>
           <div className="users-list">
             {anonymousUsers.map((user) => (
-              <div key={user.id} className="user-card anonymous">
-                <FaUserSlash className="anonymous-icon" />
-                <div className="user-details">
-                  <div className="user-name">زائر</div>
-                  
-                  <div className="user-meta">
-                    <span className="user-location">
-                      <FaMapMarkerAlt /> {getLocationString(user.location)}
-                    </span>
-                    <span className="user-time">
-                      <FaClock /> {formatTimeAgo(user.lastSeen)}
-                    </span>
+              <div key={user.id} className="user-card anonymous detailed">
+                <div className="user-header">
+                  <FaUserSlash className="anonymous-icon-large" />
+                  <div className="user-basic-info">
+                    <div className="user-name">زائر</div>
+                    <div className="user-id-badge">ID: {user.id.substring(0, 12)}...</div>
                   </div>
-                  
-                  {/* عدد الزيارات ومدة الجلسة */}
-                  <div className="user-stats">
-                    <span className="stat-badge">
-                      🔢 زاره {user.visitCount || 1} مرة
-                    </span>
-                    <span className="stat-badge">
-                      ⏱️ {formatDuration(user.sessionDuration || 0)}
-                    </span>
-                  </div>
-                  
-                  {/* الصفحة الحالية */}
-                  {user.currentPage && (
-                    <div className="user-activity">
-                      📄 {user.currentPage}
+                  <div className="online-indicator"></div>
+                </div>
+                
+                <div className="user-details-grid">
+                  {/* معلومات الموقع */}
+                  <div className="detail-section">
+                    <div className="section-header">
+                      <FaMapMarkerAlt /> الموقع الجغرافي
                     </div>
-                  )}
+                    <div className="section-content">
+                      <div className="detail-item">
+                        <span className="detail-label">الدولة:</span>
+                        <span className="detail-value">{translateToArabic(user.location?.country || user.country || 'غير معروف')}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">المدينة:</span>
+                        <span className="detail-value">{translateToArabic(user.location?.city || user.city || 'غير معروف')}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">المنطقة:</span>
+                        <span className="detail-value">{translateToArabic(user.location?.region || user.region || 'غير معروف')}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">IP:</span>
+                        <span className="detail-value" style={{fontSize: '11px'}}>{user.ip || 'مخفي'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* معلومات الجهاز */}
+                  <div className="detail-section">
+                    <div className="section-header">
+                      📱 الجهاز والمتصفح
+                    </div>
+                    <div className="section-content">
+                      <div className="detail-item">
+                        <span className="detail-label">الجهاز:</span>
+                        <span className="detail-value">{translateToArabic(user.device || 'غير معروف')}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">النظام:</span>
+                        <span className="detail-value">{translateToArabic(user.os || 'غير معروف')}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="detail-label">المتصفح:</span>
+                        <span className="detail-value">{translateToArabic(user.browser || 'غير معروف')}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* النشاط والإحصائيات */}
+                  <div className="detail-section full-width">
+                    <div className="section-header">
+                      📊 الإحصائيات والنشاط
+                    </div>
+                    <div className="section-content stats-grid">
+                      <div className="stat-item-small">
+                        <div className="stat-icon-small">🔢</div>
+                        <div>
+                          <div className="stat-value-small">{user.visitCount || 1}</div>
+                          <div className="stat-label-small">زيارة</div>
+                        </div>
+                      </div>
+                      <div className="stat-item-small">
+                        <div className="stat-icon-small">⏱️</div>
+                        <div>
+                          <div className="stat-value-small">{formatDuration(user.sessionDuration || 0)}</div>
+                          <div className="stat-label-small">مدة الجلسة</div>
+                        </div>
+                      </div>
+                      <div className="stat-item-small">
+                        <div className="stat-icon-small">🕐</div>
+                        <div>
+                          <div className="stat-value-small">{formatTimeAgo(user.lastSeen)}</div>
+                          <div className="stat-label-small">آخر نشاط</div>
+                        </div>
+                      </div>
+                      <div className="stat-item-small">
+                        <div className="stat-icon-small">📄</div>
+                        <div>
+                          <div className="stat-value-small" style={{fontSize: '11px'}}>{user.currentPage || '/'}</div>
+                          <div className="stat-label-small">الصفحة الحالية</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   
                   {/* الشريط الحالي */}
                   {user.currentlyPlaying && (
-                    <div className="currently-playing">
-                      🎵 <strong>يستمع الآن:</strong> {user.currentlyPlaying.cassetteTitle}
-                      {user.currentlyPlaying.itemTitle && ` - ${user.currentlyPlaying.itemTitle}`}
+                    <div className="detail-section full-width playing-now">
+                      <div className="section-header">
+                        🎵 يستمع الآن
+                      </div>
+                      <div className="currently-playing-details">
+                        <div className="cassette-name">{user.currentlyPlaying.cassetteTitle}</div>
+                        {user.currentlyPlaying.itemTitle && (
+                          <div className="track-name">{user.currentlyPlaying.itemTitle}</div>
+                        )}
+                        <div className="play-time">بدأ منذ {formatTimeAgo(user.currentlyPlaying.timestamp)}</div>
+                      </div>
                     </div>
                   )}
                   
                   {/* الأكثر استماعاً */}
                   {user.mostPlayedCassette && (
-                    <div className="most-played">
-                      ⭐ <strong>الأكثر استماعاً:</strong> {user.mostPlayedCassette.title} ({user.mostPlayedCassette.count} مرة)
+                    <div className="detail-section full-width favorite">
+                      <div className="section-header">
+                        ⭐ الشريط المفضل
+                      </div>
+                      <div className="favorite-details">
+                        <div className="cassette-name">{user.mostPlayedCassette.title}</div>
+                        <div className="play-count">استمع له {user.mostPlayedCassette.count} مرة</div>
+                      </div>
                     </div>
                   )}
                   
-                  <div className="user-id">ID: {user.id.substring(0, 8)}...</div>
+                  {/* تاريخ التشغيل */}
+                  {user.playHistory && user.playHistory.length > 0 && (
+                    <div className="detail-section full-width history">
+                      <div className="section-header">
+                        📜 تاريخ الاستماع ({user.playHistory.length})
+                      </div>
+                      <div className="play-history-list">
+                        {user.playHistory.slice(0, 5).map((play, idx) => (
+                          <div key={idx} className="history-item">
+                            <div className="history-title">{play.cassetteTitle}</div>
+                            <div className="history-time">{formatTimeAgo(play.timestamp)}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="online-indicator"></div>
               </div>
             ))}
           </div>
