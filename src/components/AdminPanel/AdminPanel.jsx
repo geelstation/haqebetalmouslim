@@ -29,6 +29,8 @@ function AdminPanel({ isAdmin, currentUser }) {
   const [stats, setStats] = useState({ totalVisits: 0, uniqueVisitors: 0, onlineNow: 0 });
   const [showAllVisitorsModal, setShowAllVisitorsModal] = useState(false);
   const [allVisitorsData, setAllVisitorsData] = useState([]);
+  const [showListenersModal, setShowListenersModal] = useState(false);
+  const [currentListeners, setCurrentListeners] = useState([]);
 
   // دالة تعريب النصوص
   const translateToArabic = (text) => {
@@ -176,6 +178,11 @@ function AdminPanel({ isAdmin, currentUser }) {
       // حفظ بيانات كل الزوار للـ modal
       if (s.allVisitors) {
         setAllVisitorsData(s.allVisitors);
+      }
+      
+      // حفظ المستمعين الحاليين
+      if (s.topPlaying) {
+        setCurrentListeners(s.topPlaying);
       }
     } catch (e) {
       console.error('❌ AdminPanel: خطأ في تحميل الإحصائيات:', e);
@@ -377,12 +384,12 @@ function AdminPanel({ isAdmin, currentUser }) {
             </div>
           </div>
           
-          <div className="main-stat-card listening">
+          <div className="main-stat-card listening" onClick={() => setShowListenersModal(true)} style={{cursor: 'pointer'}}>
             <div className="stat-icon">🎧</div>
             <div className="stat-content">
               <div className="stat-value">{stats.activeListeners || 0}</div>
               <div className="stat-label">يستمعون الآن</div>
-              <div className="stat-hint">تشغيل مباشر</div>
+              <div className="stat-hint">اضغط لعرض التفاصيل</div>
             </div>
           </div>
           
@@ -892,6 +899,96 @@ function AdminPanel({ isAdmin, currentUser }) {
               <button className="cancel-btn" onClick={() => setEditMode(false)}>
                 إلغاء
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal: المستمعون الآن */}
+      {showListenersModal && (
+        <div className="modal-overlay" onClick={() => setShowListenersModal(false)}>
+          <div className="modal-content listeners-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>🎧 يستمعون الآن ({currentListeners.length})</h2>
+              <button className="close-btn" onClick={() => setShowListenersModal(false)}>✕</button>
+            </div>
+            
+            <div className="modal-body">
+              {currentListeners.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-icon">🎵</div>
+                  <p>لا يوجد أحد يستمع الآن</p>
+                </div>
+              ) : (
+                <div className="listeners-grid">
+                  {currentListeners.map((listener) => {
+                    const visitor = allVisitorsData.find(v => 
+                      v.currentlyPlaying && 
+                      v.currentlyPlaying.cassetteTitle === listener.cassetteTitle
+                    );
+                    
+                    return (
+                      <div key={listener.cassetteTitle} className="listener-card">
+                        {/* الشريط المُشغَّل */}
+                        <div className="playing-cassette">
+                          <div className="cassette-header">
+                            <div className="playing-indicator">
+                              <span className="pulse-dot"></span>
+                              <span className="live-text">مباشر</span>
+                            </div>
+                            <div className="listeners-count">{listener.count} مستمع</div>
+                          </div>
+                          <h3 className="cassette-title-large">{listener.cassetteTitle}</h3>
+                        </div>
+                        
+                        {/* قائمة المستمعين لهذا الشريط */}
+                        <div className="listeners-list">
+                          <h4>👥 المستمعون:</h4>
+                          {allVisitorsData
+                            .filter(v => v.currentlyPlaying && v.currentlyPlaying.cassetteTitle === listener.cassetteTitle)
+                            .map((v, idx) => (
+                              <div key={v.id} className="listener-item">
+                                <div className="listener-avatar">
+                                  {v.photoURL ? (
+                                    <img src={v.photoURL} alt={v.displayName} />
+                                  ) : (
+                                    <div className="avatar-placeholder">
+                                      {v.isAnonymous ? '👤' : '👤'}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="listener-info">
+                                  <div className="listener-name">
+                                    {v.displayName || 'زائر'}
+                                    <span className={`listener-badge ${v.isAnonymous ? 'anonymous' : 'registered'}`}>
+                                      {v.isAnonymous ? 'زائر' : 'مسجل'}
+                                    </span>
+                                  </div>
+                                  <div className="listener-location">
+                                    📍 {translateToArabic(v.city || 'غير معروف')}, {translateToArabic(v.country || 'غير معروف')}
+                                  </div>
+                                  <div className="listener-device">
+                                    📱 {translateToArabic(v.device || 'غير معروف')} • {translateToArabic(v.browser || 'غير معروف')}
+                                  </div>
+                                  {v.currentlyPlaying.itemTitle && (
+                                    <div className="current-track">
+                                      🎵 {v.currentlyPlaying.itemTitle}
+                                    </div>
+                                  )}
+                                  <div className="listener-stats">
+                                    <span>⏱️ {formatDuration(v.sessionDuration || 0)}</span>
+                                    <span>•</span>
+                                    <span>🔢 {v.visitCount || 1} زيارة</span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
