@@ -404,14 +404,16 @@ function AdminPanel({ isAdmin, currentUser }) {
             أشرطتي ({myCassettes.length})
           </button>
           <button 
+            className={`tab-btn ${viewMode === 'mine' ? 'active' : ''}`}
+            onClick={() => setViewMode('mine')}
+          >
+            أشرطتي ({myCassettes.length})
+          </button>
+          <button 
             className={`tab-btn ${viewMode === 'online' ? 'active' : ''}`}
             onClick={() => setViewMode('online')}
           >
             <FaUsers /> المتواجدون الآن
-          </button>
-            onClick={() => setViewMode('mine')}
-          >
-            أشرطتي ({myCassettes.length})
           </button>
         </div>
       </div>
