@@ -378,7 +378,90 @@ function AdminPanel({ isAdmin, currentUser }) {
             </div>
           </div>
         </div>
-
+        {/* إحصائيات متقدمة - صف ثاني */}
+        <div className="advanced-stats-grid">
+          <div className="advanced-stat-card today">
+            <div className="stat-icon">📅</div>
+            <div className="stat-content">
+              <div className="stat-value">{stats.visitsToday || 0}</div>
+              <div className="stat-label">زيارات اليوم</div>
+              <div className="stat-hint">من بداية اليوم</div>
+            </div>
+          </div>
+          
+          <div className="advanced-stat-card week">
+            <div className="stat-icon">📆</div>
+            <div className="stat-content">
+              <div className="stat-value">{stats.visitsThisWeek || 0}</div>
+              <div className="stat-label">زيارات الأسبوع</div>
+              <div className="stat-hint">آخر 7 أيام</div>
+            </div>
+          </div>
+          
+          <div className="advanced-stat-card growth">
+            <div className="stat-icon">{stats.growthRate >= 0 ? '📈' : '📉'}</div>
+            <div className="stat-content">
+              <div className="stat-value" style={{color: stats.growthRate >= 0 ? '#4caf50' : '#f44336'}}>
+                {stats.growthRate > 0 ? '+' : ''}{stats.growthRate || 0}%
+              </div>
+              <div className="stat-label">معدل النمو</div>
+              <div className="stat-hint">مقارنة بالأسبوع الماضي</div>
+            </div>
+          </div>
+          
+          <div className="advanced-stat-card session">
+            <div className="stat-icon">⭐</div>
+            <div className="stat-content">
+              <div className="stat-value">
+                {Math.floor((stats.avgSessionDuration || 0) / 60)}:{String((stats.avgSessionDuration || 0) % 60).padStart(2, '0')}
+              </div>
+              <div className="stat-label">متوسط مدة الجلسة</div>
+              <div className="stat-hint">دقيقة:ثانية</div>
+            </div>
+          </div>
+          
+          <div className="advanced-stat-card country">
+            <div className="stat-icon">🌍</div>
+            <div className="stat-content">
+              <div className="stat-value" style={{fontSize: '18px'}}>
+                {stats.topCountry ? translateToArabic(stats.topCountry.country) : 'لا يوجد'}
+              </div>
+              <div className="stat-label">أكثر دولة نشاطاً</div>
+              <div className="stat-hint">{stats.topCountry ? `${stats.topCountry.count} زائر` : ''}</div>
+            </div>
+          </div>
+          
+          <div className="advanced-stat-card peak">
+            <div className="stat-icon">⏰</div>
+            <div className="stat-content">
+              <div className="stat-value" style={{fontSize: '14px'}}>
+                {stats.peakHour || 'لا يوجد'}
+              </div>
+              <div className="stat-label">أكثر وقت نشاطاً</div>
+              <div className="stat-hint">حسب الساعة</div>
+            </div>
+          </div>
+          
+          <div className="advanced-stat-card registered">
+            <div className="stat-icon">👤</div>
+            <div className="stat-content">
+              <div className="stat-value">{stats.registeredPercentage || 0}%</div>
+              <div className="stat-label">نسبة المسجلين</div>
+              <div className="stat-hint">{stats.registeredUsers || 0} مسجل / {stats.anonymousUsers || 0} زائر</div>
+            </div>
+          </div>
+          
+          <div className="advanced-stat-card top-cassette">
+            <div className="stat-icon">🔝</div>
+            <div className="stat-content">
+              <div className="stat-value" style={{fontSize: '14px'}}>
+                {stats.topPlayedToday ? stats.topPlayedToday.title : 'لا يوجد'}
+              </div>
+              <div className="stat-label">أكثر شريط اليوم</div>
+              <div className="stat-hint">{stats.topPlayedToday ? `${stats.topPlayedToday.count} تشغيل` : ''}</div>
+            </div>
+          </div>
+        </div>
         {/* شبكة الإحصائيات التفصيلية */}
         <div className="stats-grid">
         {/* إحصائيات الدول */}

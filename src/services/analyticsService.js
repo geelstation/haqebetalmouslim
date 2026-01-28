@@ -248,6 +248,62 @@ export async function getStats() {
       return ts && (now - ts) <= (10 * 60 * 1000);
     });
     
+    // حساب زيارات اليوم والأسبوع
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    const startOfWeek = new Date(startOfToday);
+    startOfWeek.setDate(startOfWeek.getDate() - 7);
+    const startOfLastWeek = new Date(startOfWeek);
+    startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
+    
+    const visitsToday = all.filter(v => {
+      const ts = v.firstSeen instanceof Date ? v.firstSeen.getTime() : (v.firstSeen?.toMillis?.() || 0);
+      return ts >= startOfToday.getTime();
+    }).length;
+    
+    const visitsThisWeek = all.filter(v => {
+      const ts = v.firstSeen instanceof Date ? v.firstSeen.getTime() : (v.firstSeen?.toMillis?.() || 0);
+      return ts >= startOfWeek.getTime();
+    }).length;
+    
+    const visitsLastWeek = all.filter(v => {
+      const ts = v.firstSeen instanceof Date ? v.firstSeen.getTime() : (v.firstSeen?.toMillis?.() || 0);
+      return ts >= startOfLastWeek.getTime() && ts < startOfWeek.getTime();
+    }).length;
+    
+    // معدل النمو
+    const growthRate = visitsLastWeek > 0 
+      ? Math.round(((visitsThisWeek - visitsLastWeek) / visitsLastWeek) * 100)
+      : 0;
+    
+    // متوسط مدة الجلسة
+    const totalSessionTime = all.reduce((sum, v) => sum + (v.sessionDuration || 0), 0);
+    const avgSessionDuration = all.length > 0 ? Math.floor(totalSessionTime / all.length) : 0;
+    
+    // نسبة المسجلين
+    const registeredUsers = all.filter(v => !v.isAnonymous).length;
+    const anonymousUsers = all.filter(v => v.isAnonymous).length;
+    const registeredPercentage = all.length > 0 
+      ? Math.round((registeredUsers / all.length) * 100)
+      : 0;
+    
+    // أكثر وقت نشاطاً (حسب الساعة)
+    const hourStats = {};
+    all.forEach(visitor => {
+      const ts = visitor.lastSeen instanceof Date ? visitor.lastSeen : visitor.lastSeen?.toDate?.();
+      if (ts) {
+        const hour = ts.getHours();
+        hourStats[hour] = (hourStats[hour] || 0) + 1;
+      }
+    });
+    
+    const peakHour = Object.entries(hourStats)
+      .sort((a, b) => b[1] - a[1])[0];
+    
+    const peakHourFormatted = peakHour 
+      ? `${peakHour[0]}:00 - ${parseInt(peakHour[0]) + 1}:00 (${peakHour[1]} زائر)`
+      : 'لا يوجد بيانات';
+    
     // إحصائيات الدول والمدن
     const countryStats = {};
     const cityStats = {};
@@ -332,10 +388,37 @@ export async function getStats() {
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
     
+    // أكثر شريط اليوم
+    const todayPlays = {};
+    all.forEach(visitor => {
+      if (visitor.playHistory && Array.isArray(visitor.playHistory)) {
+        visitor.playHistory.forEach(play => {
+          const playTs = play.timestamp instanceof Date ? play.timestamp.getTime() : (play.timestamp?.toMillis?.() || 0);
+          if (playTs >= startOfToday.getTime()) {
+            todayPlays[play.cassetteTitle] = (todayPlays[play.cassetteTitle] || 0) + 1;
+          }
+        });
+      }
+    });
+    
+    const topPlayedToday = Object.entries(todayPlays)
+      .map(([title, count]) => ({ title, count }))
+      .sort((a, b) => b.count - a.count)[0];
+    
     return {
       totalVisits,
       uniqueVisitors: all.length,
       onlineNow: onlineUsers.length,
+      visitsToday,
+      visitsThisWeek,
+      growthRate,
+      avgSessionDuration,
+      registeredUsers,
+      anonymousUsers,
+      registeredPercentage,
+      peakHour: peakHourFormatted,
+      topCountry: topCountries[0],
+      topPlayedToday,
       topCountries,
       topCities,
       topRegions,

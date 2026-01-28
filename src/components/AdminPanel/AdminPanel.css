@@ -114,6 +114,85 @@
 .main-stat-card.pending:hover { border-color: #ffc107; }
 .main-stat-card.pending .stat-value { color: #ffc107; }
 
+/* بطاقات الإحصائيات المتقدمة */
+.advanced-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.advanced-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.advanced-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: var(--accent-color);
+}
+
+.advanced-stat-card .stat-icon {
+  font-size: 28px;
+  min-width: 40px;
+  text-align: center;
+}
+
+.advanced-stat-card .stat-content {
+  flex: 1;
+}
+
+.advanced-stat-card .stat-value {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--accent-color);
+  line-height: 1.2;
+}
+
+.advanced-stat-card .stat-label {
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.advanced-stat-card .stat-hint {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ألوان مخصصة للبطاقات المتقدمة */
+.advanced-stat-card.today:hover { border-color: #00bcd4; }
+.advanced-stat-card.today .stat-value { color: #00bcd4; }
+
+.advanced-stat-card.week:hover { border-color: #673ab7; }
+.advanced-stat-card.week .stat-value { color: #673ab7; }
+
+.advanced-stat-card.growth:hover { border-color: #4caf50; }
+
+.advanced-stat-card.session:hover { border-color: #ff9800; }
+.advanced-stat-card.session .stat-value { color: #ff9800; }
+
+.advanced-stat-card.country:hover { border-color: #2196f3; }
+.advanced-stat-card.country .stat-value { color: #2196f3; }
+
+.advanced-stat-card.peak:hover { border-color: #e91e63; }
+.advanced-stat-card.peak .stat-value { color: #e91e63; }
+
+.advanced-stat-card.registered:hover { border-color: #9c27b0; }
+.advanced-stat-card.registered .stat-value { color: #9c27b0; }
+
+.advanced-stat-card.top-cassette:hover { border-color: #ffc107; }
+.advanced-stat-card.top-cassette .stat-value { color: #ffc107; }
+
 .admin-header p {
   color: var(--accent-color);
   font-size: 18px;
