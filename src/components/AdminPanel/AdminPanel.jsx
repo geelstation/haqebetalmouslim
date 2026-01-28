@@ -27,6 +27,8 @@ function AdminPanel({ isAdmin, currentUser }) {
   const [separatorIcon, setSeparatorIcon] = useState('☪');
   const [isEditingMessage, setIsEditingMessage] = useState(false);
   const [stats, setStats] = useState({ totalVisits: 0, uniqueVisitors: 0, onlineNow: 0 });
+  const [showAllVisitorsModal, setShowAllVisitorsModal] = useState(false);
+  const [allVisitorsData, setAllVisitorsData] = useState([]);
 
   // دالة تعريب النصوص
   const translateToArabic = (text) => {
@@ -170,10 +172,28 @@ function AdminPanel({ isAdmin, currentUser }) {
         onlineNow: s.onlineNow
       });
       setStats(s);
+      
+      // حفظ بيانات كل الزوار للـ modal
+      if (s.allVisitors) {
+        setAllVisitorsData(s.allVisitors);
+      }
     } catch (e) {
       console.error('❌ AdminPanel: خطأ في تحميل الإحصائيات:', e);
       setStats({ totalVisits: 0, uniqueVisitors: 0, onlineNow: 0 });
     }
+  };
+  
+  const formatDuration = (seconds) => {
+    if (!seconds) return '0 ثانية';
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    let result = '';
+    if (hours > 0) result += `${hours} ساعة `;
+    if (minutes > 0) result += `${minutes} دقيقة `;
+    if (secs > 0 || !result) result += `${secs} ثانية`;
+    return result.trim();
   };
 
   const loadPendingCassettes = async () => {
@@ -339,12 +359,12 @@ function AdminPanel({ isAdmin, currentUser }) {
             </div>
           </div>
           
-          <div className="main-stat-card visitors">
+          <div className="main-stat-card visitors" onClick={() => setShowAllVisitorsModal(true)} style={{cursor: 'pointer'}}>
             <div className="stat-icon">👥</div>
             <div className="stat-content">
               <div className="stat-value">{stats.uniqueVisitors || 0}</div>
               <div className="stat-label">زوار فريدين</div>
-              <div className="stat-hint">عدد الأشخاص المختلفين</div>
+              <div className="stat-hint">اضغط لعرض التفاصيل</div>
             </div>
           </div>
           
@@ -872,6 +892,130 @@ function AdminPanel({ isAdmin, currentUser }) {
               <button className="cancel-btn" onClick={() => setEditMode(false)}>
                 إلغاء
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal: كل الزوار الفريدين */}
+      {showAllVisitorsModal && (
+        <div className="modal-overlay" onClick={() => setShowAllVisitorsModal(false)}>
+          <div className="modal-content all-visitors-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>👥 جميع الزوار الفريدين ({allVisitorsData.length})</h2>
+              <button className="close-btn" onClick={() => setShowAllVisitorsModal(false)}>✕</button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="visitors-grid">
+                {allVisitorsData
+                  .sort((a, b) => {
+                    const aTime = a.lastSeen instanceof Date ? a.lastSeen.getTime() : (a.lastSeen?.toMillis?.() || 0);
+                    const bTime = b.lastSeen instanceof Date ? b.lastSeen.getTime() : (b.lastSeen?.toMillis?.() || 0);
+                    return bTime - aTime;
+                  })
+                  .map((visitor) => (
+                  <div key={visitor.id} className={`visitor-detail-card ${visitor.isAnonymous ? 'anonymous' : 'registered'}`}>
+                    {/* الرأس */}
+                    <div className="visitor-header">
+                      {visitor.photoURL ? (
+                        <img src={visitor.photoURL} alt={visitor.displayName} className="visitor-avatar" />
+                      ) : (
+                        <div className="visitor-avatar-placeholder">
+                          {visitor.isAnonymous ? '👤' : '👤'}
+                        </div>
+                      )}
+                      <div className="visitor-basic">
+                        <h3>{visitor.displayName || 'زائر'}</h3>
+                        <p>{visitor.email || `ID: ${visitor.id.substring(0, 12)}...`}</p>
+                        <span className={`visitor-badge ${visitor.isAnonymous ? 'anonymous' : 'registered'}`}>
+                          {visitor.isAnonymous ? 'زائر' : 'مسجل'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* الموقع */}
+                    <div className="visitor-section">
+                      <h4>🌍 الموقع</h4>
+                      <div className="visitor-info-grid">
+                        <div className="info-item">
+                          <span className="label">الدولة:</span>
+                          <span className="value">{translateToArabic(visitor.country || 'غير معروف')}</span>
+                        </div>
+                        <div className="info-item">
+                          <span className="label">المدينة:</span>
+                          <span className="value">{translateToArabic(visitor.city || 'غير معروف')}</span>
+                        </div>
+                        <div className="info-item">
+                          <span className="label">المنطقة:</span>
+                          <span className="value">{translateToArabic(visitor.region || 'غير معروف')}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* الإحصائيات */}
+                    <div className="visitor-section">
+                      <h4>📊 الإحصائيات</h4>
+                      <div className="visitor-stats-row">
+                        <div className="stat-box-small">
+                          <div className="stat-icon-mini">🔢</div>
+                          <div>
+                            <div className="stat-value-mini">{visitor.visitCount || 1}</div>
+                            <div className="stat-label-mini">زيارة</div>
+                          </div>
+                        </div>
+                        <div className="stat-box-small">
+                          <div className="stat-icon-mini">⏱️</div>
+                          <div>
+                            <div className="stat-value-mini">{formatDuration(visitor.sessionDuration || 0)}</div>
+                            <div className="stat-label-mini">وقت الجلسة</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* الشريط المفضل */}
+                    {visitor.mostPlayedCassette && (
+                      <div className="visitor-section">
+                        <h4>⭐ الأكثر استماعاً</h4>
+                        <div className="favorite-cassette">
+                          <span className="cassette-name">{visitor.mostPlayedCassette.title}</span>
+                          <span className="play-count">{visitor.mostPlayedCassette.count} مرة</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* تاريخ الاستماع */}
+                    {visitor.playHistory && visitor.playHistory.length > 0 && (
+                      <div className="visitor-section">
+                        <h4>📜 تاريخ الاستماع</h4>
+                        <div className="play-history-compact">
+                          {visitor.playHistory.slice(0, 3).map((play, idx) => (
+                            <div key={idx} className="play-item-compact">
+                              <span className="play-title">{play.cassetteTitle}</span>
+                            </div>
+                          ))}
+                          {visitor.playHistory.length > 3 && (
+                            <div className="more-plays">+{visitor.playHistory.length - 3} أخرى</div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* الجهاز */}
+                    <div className="visitor-section">
+                      <h4>📱 الجهاز</h4>
+                      <div className="device-info">
+                        <span>{translateToArabic(visitor.device || 'غير معروف')}</span>
+                        <span>•</span>
+                        <span>{translateToArabic(visitor.os || 'غير معروف')}</span>
+                        <span>•</span>
+                        <span>{translateToArabic(visitor.browser || 'غير معروف')}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
