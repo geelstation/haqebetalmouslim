@@ -28,7 +28,10 @@ function EditCassetteModal({ isOpen, onClose, cassette, onCassetteUpdated }) {
 
   // إضافة صف جديد لرابط صوتي
   const addAudioItem = () => {
-    setAudioItems([...audioItems, { name: '', url: '' }]);
+    console.log('➕ إضافة ملف جديد - العدد الحالي:', audioItems.length);
+    const newItems = [...audioItems, { name: '', url: '' }];
+    setAudioItems(newItems);
+    console.log('✅ تم الإضافة - العدد الجديد:', newItems.length);
   };
 
   // حذف صف رابط صوتي
