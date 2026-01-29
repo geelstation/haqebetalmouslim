@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaCheck, FaTimes, FaEdit, FaEye, FaTrash, FaBullhorn, FaUsers, FaCheckCircle, FaUserCheck } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaEdit, FaEye, FaTrash, FaBullhorn, FaUsers, FaCheckCircle, FaUserCheck, FaUserFriends } from 'react-icons/fa';
 import { 
   getPendingCassettes, 
   getAllCassettes,
@@ -9,6 +9,8 @@ import {
   updateCassette,
   deleteCassette 
 } from '../../services/cassetteService';
+import { db } from '../../firebase/config';
+import { collection, getDocs } from 'firebase/firestore';
 import { getAppSettings, updateTopBarMessage } from '../../services/settingsService';
 import { getAllVerifiedUsers, verifyUser, unverifyUser } from '../../services/verificationService';
 import './AdminPanel.css';
@@ -44,6 +46,9 @@ function AdminPanel({ isAdmin, currentUser }) {
     facebook: '',
     twitter: ''
   });
+  const [allUsers, setAllUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showUserDetailsModal, setShowUserDetailsModal] = useState(false);
 
   // دالة تعريب النصوص
   const translateToArabic = (text) => {
@@ -150,7 +155,11 @@ function AdminPanel({ isAdmin, currentUser }) {
       loadTopBarMessage();
       loadStats();
       loadVerifiedUsers();
-      const interval = setInterval(loadStats, 30000);
+      loadAllUsers();
+      const interval = setInterval(() => {
+        loadStats();
+        loadAllUsers();
+      }, 30000);
       return () => clearInterval(interval);
     }
     if (currentUser) {
@@ -260,6 +269,29 @@ function AdminPanel({ isAdmin, currentUser }) {
       } catch (e) {
         alert('فشل إلغاء التوثيق: ' + e.message);
       }
+    }
+  };
+  
+  const loadAllUsers = async () => {
+    try {
+      const presenceRef = collection(db, 'presence');
+      const snapshot = await getDocs(presenceRef);
+      const users = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      
+      // ترتيب حسب آخر نشاط
+      users.sort((a, b) => {
+        const aTime = a.lastSeen?.toDate?.() || new Date(0);
+        const bTime = b.lastSeen?.toDate?.() || new Date(0);
+        return bTime - aTime;
+      });
+      
+      setAllUsers(users);
+      console.log('✅ تم تحميل المستخدمين:', users.length);
+    } catch (e) {
+      console.error('❌ خطأ في تحميل المستخدمين:', e);
     }
   };
 
@@ -717,6 +749,12 @@ function AdminPanel({ isAdmin, currentUser }) {
             أشرطتي ({myCassettes.length})
           </button>
           <button 
+            className={`tab-btn ${viewMode === 'users' ? 'active' : ''}`}
+            onClick={() => setViewMode('users')}
+          >
+            <FaUserFriends /> المستخدمون ({allUsers.length})
+          </button>
+          <button 
             className={`tab-btn ${viewMode === 'online' ? 'active' : ''}`}
             onClick={() => setViewMode('online')}
           >
@@ -822,6 +860,109 @@ function AdminPanel({ isAdmin, currentUser }) {
 
       {viewMode === 'online' ? (
         <OnlineUsers />
+      ) : viewMode === 'users' ? (
+        <div className="users-section">
+          <div className="section-header">
+            <h2><FaUserFriends /> كل المستخدمين ({allUsers.length})</h2>
+            <button 
+              className="refresh-btn"
+              onClick={() => loadAllUsers()}
+            >
+              🔄 تحديث
+            </button>
+          </div>
+
+          <div className="users-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>المستخدم</th>
+                  <th>الموقع</th>
+                  <th>الجهاز</th>
+                  <th>يستمع الآن</th>
+                  <th>الحالة</th>
+                  <th>آخر نشاط</th>
+                  <th>التفاصيل</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allUsers.map(user => {
+                  const isOnline = user.isOnline && user.lastSeen?.toDate && 
+                    (Date.now() - user.lastSeen.toDate().getTime()) < 120000; // 2 دقائق
+                  
+                  return (
+                    <tr key={user.id} className={isOnline ? 'online' : 'offline'}>
+                      <td>
+                        <div className="user-cell">
+                          {user.photoURL && (
+                            <img src={user.photoURL} alt="" className="user-avatar-small" />
+                          )}
+                          <div>
+                            <div className="user-name-small">
+                              {user.displayName || user.email || 'زائر'}
+                            </div>
+                            <div className="user-email-small">{user.email || 'غير مسجل'}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="location-cell">
+                          <div>{translateToArabic(user.country) || 'غير معروف'}</div>
+                          <div className="city-small">{translateToArabic(user.city) || ''}</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="device-cell">
+                          <div>{translateToArabic(user.device) || '-'}</div>
+                          <div className="os-small">{translateToArabic(user.os) || ''}</div>
+                        </div>
+                      </td>
+                      <td>
+                        {user.currentlyPlaying ? (
+                          <div className="playing-cell">
+                            <div className="playing-title">{user.currentlyPlaying.cassetteTitle}</div>
+                            <div className="playing-item">{user.currentlyPlaying.itemTitle}</div>
+                          </div>
+                        ) : (
+                          <span className="no-play">-</span>
+                        )}
+                      </td>
+                      <td>
+                        <span className={`status-dot ${isOnline ? 'online' : 'offline'}`}>
+                          {isOnline ? '🟢 متصل' : '⚫ غير متصل'}
+                        </span>
+                      </td>
+                      <td>
+                        {user.lastSeen?.toDate ? (
+                          <div className="time-cell">
+                            <div>{new Date(user.lastSeen.toDate()).toLocaleDateString('ar-EG')}</div>
+                            <div className="time-small">
+                              {new Date(user.lastSeen.toDate()).toLocaleTimeString('ar-EG', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </div>
+                          </div>
+                        ) : '-'}
+                      </td>
+                      <td>
+                        <button 
+                          className="details-btn"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setShowUserDetailsModal(true);
+                          }}
+                        >
+                          <FaEye /> عرض
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       ) : viewMode === 'verified' ? (
         <div className="verified-section">
           <div className="section-header">
@@ -1340,6 +1481,166 @@ function AdminPanel({ isAdmin, currentUser }) {
               <button className="verify-btn" onClick={handleVerifyUser}>
                 <FaCheckCircle /> توثيق الحساب
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal: تفاصيل المستخدم */}
+      {showUserDetailsModal && selectedUser && (
+        <div className="modal-overlay" onClick={() => setShowUserDetailsModal(false)}>
+          <div className="modal-content user-details-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>📊 تفاصيل المستخدم الكاملة</h2>
+              <button className="close-btn" onClick={() => setShowUserDetailsModal(false)}>✕</button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="user-details-grid">
+                {/* معلومات الحساب */}
+                <div className="detail-section">
+                  <h3>👤 معلومات الحساب</h3>
+                  <div className="detail-item">
+                    <span className="label">الاسم:</span>
+                    <span className="value">{selectedUser.displayName || 'غير محدد'}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">البريد:</span>
+                    <span className="value">{selectedUser.email || 'غير مسجل'}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">معرف الزائر:</span>
+                    <span className="value small">{selectedUser.visitorId}</span>
+                  </div>
+                  {selectedUser.photoURL && (
+                    <div className="detail-item">
+                      <span className="label">الصورة:</span>
+                      <img src={selectedUser.photoURL} alt="صورة المستخدم" className="user-photo-large" />
+                    </div>
+                  )}
+                </div>
+
+                {/* الموقع الجغرافي */}
+                <div className="detail-section">
+                  <h3>🌍 الموقع الجغرافي</h3>
+                  <div className="detail-item">
+                    <span className="label">الدولة:</span>
+                    <span className="value">{translateToArabic(selectedUser.country)} ({selectedUser.countryCode})</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">المدينة:</span>
+                    <span className="value">{translateToArabic(selectedUser.city)}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">المنطقة:</span>
+                    <span className="value">{translateToArabic(selectedUser.region)}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">المنطقة الزمنية:</span>
+                    <span className="value">{translateToArabic(selectedUser.timezone)}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">العملة:</span>
+                    <span className="value">{translateToArabic(selectedUser.currency)}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">IP:</span>
+                    <span className="value small">{selectedUser.ip}</span>
+                  </div>
+                </div>
+
+                {/* الجهاز والمتصفح */}
+                <div className="detail-section">
+                  <h3>💻 الجهاز والمتصفح</h3>
+                  <div className="detail-item">
+                    <span className="label">نوع الجهاز:</span>
+                    <span className="value">{translateToArabic(selectedUser.device)}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">نظام التشغيل:</span>
+                    <span className="value">{translateToArabic(selectedUser.os)}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">المتصفح:</span>
+                    <span className="value">{translateToArabic(selectedUser.browser)}</span>
+                  </div>
+                </div>
+
+                {/* حالة النشاط */}
+                <div className="detail-section">
+                  <h3>⏰ حالة النشاط</h3>
+                  <div className="detail-item">
+                    <span className="label">الحالة:</span>
+                    <span className={`value status-${selectedUser.isOnline ? 'online' : 'offline'}`}>
+                      {selectedUser.isOnline ? '🟢 متصل الآن' : '⚫ غير متصل'}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">أول زيارة:</span>
+                    <span className="value">
+                      {selectedUser.firstSeen?.toDate ? 
+                        new Date(selectedUser.firstSeen.toDate()).toLocaleString('ar-EG') : '-'}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">آخر نشاط:</span>
+                    <span className="value">
+                      {selectedUser.lastSeen?.toDate ? 
+                        new Date(selectedUser.lastSeen.toDate()).toLocaleString('ar-EG') : '-'}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">عدد الزيارات:</span>
+                    <span className="value">{selectedUser.visitCount || 1}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">مدة الجلسة:</span>
+                    <span className="value">
+                      {selectedUser.sessionDuration ? 
+                        `${Math.floor(selectedUser.sessionDuration / 60)} دقيقة` : '-'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* ما يستمع إليه الآن */}
+                {selectedUser.currentlyPlaying && (
+                  <div className="detail-section">
+                    <h3>🎵 يستمع الآن</h3>
+                    <div className="currently-playing-box">
+                      <div className="playing-cassette">{selectedUser.currentlyPlaying.cassetteTitle}</div>
+                      <div className="playing-item">{selectedUser.currentlyPlaying.itemTitle}</div>
+                      {selectedUser.currentlyPlaying.startTime && (
+                        <div className="playing-time">
+                          بدأ الاستماع: {new Date(selectedUser.currentlyPlaying.startTime).toLocaleTimeString('ar-EG')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* تاريخ الاستماع */}
+                {selectedUser.playHistory && selectedUser.playHistory.length > 0 && (
+                  <div className="detail-section full-width">
+                    <h3>📜 تاريخ الاستماع ({selectedUser.playHistory.length})</h3>
+                    <div className="play-history-list">
+                      {selectedUser.playHistory.map((play, idx) => (
+                        <div key={idx} className="history-item">
+                          <div className="history-number">{idx + 1}</div>
+                          <div className="history-content">
+                            <div className="history-cassette">{play.cassetteTitle}</div>
+                            <div className="history-item-title">{play.itemTitle}</div>
+                            {play.timestamp && (
+                              <div className="history-time">
+                                {new Date(play.timestamp).toLocaleString('ar-EG')}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
