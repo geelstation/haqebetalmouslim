@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaPlay, FaPause, FaStop, FaStepForward, FaStepBackward, FaExpand, FaCompress, FaTachometerAlt, FaClock } from 'react-icons/fa';
 import { getLocalPath } from '../../services/downloadService';
+import { prepareAudioUrl } from '../../services/audioUrlService';
 import './AudioPlayer.css';
 
 function AudioPlayer({ 
@@ -57,14 +58,17 @@ function AudioPlayer({
             console.log('🎵 تشغيل من الملف المحلي:', localPath);
             audioRef.current.src = `file://${localPath}`;
           } else if (audioUrl.startsWith('http')) {
-            // استخدام الرابط الأصلي
-            audioRef.current.src = audioUrl;
+            // معالجة الرابط (دعم archive.org وغيره)
+            const processedUrl = prepareAudioUrl(audioUrl);
+            console.log('🎵 تشغيل من الرابط:', processedUrl);
+            audioRef.current.src = processedUrl;
           }
         } catch (error) {
-          // في حالة خطأ، استخدام الرابط الأصلي
-          console.log('⚠️ استخدام الرابط الأصلي');
+          // في حالة خطأ، استخدام الرابط بعد المعالجة
+          console.log('⚠️ استخدام الرابط بعد المعالجة');
           if (audioUrl.startsWith('http')) {
-            audioRef.current.src = audioUrl;
+            const processedUrl = prepareAudioUrl(audioUrl);
+            audioRef.current.src = processedUrl;
           }
         }
         
@@ -267,6 +271,7 @@ function AudioPlayer({
       <audio 
         ref={audioRef}
         preload="auto"
+        crossOrigin="anonymous"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onWaiting={() => setIsBuffering(true)}
@@ -283,7 +288,7 @@ function AudioPlayer({
       />
       
       {/* تحميل مسبق للملف التالي (مخفي) */}
-      <audio ref={preloadAudioRef} preload="auto" style={{ display: 'none' }} />
+      <audio ref={preloadAudioRef} preload="auto" crossOrigin="anonymous" style={{ display: 'none' }} />
       
       {/* زر التكبير/التصغير */}
       {onToggleExpand && (

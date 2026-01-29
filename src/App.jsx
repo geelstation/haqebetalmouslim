@@ -20,6 +20,7 @@ import MyCassettes from './components/MyCassettes/MyCassettes';
 import MyDownloads from './components/MyDownloads/MyDownloads';
 import MyPlaylists from './components/MyPlaylists/MyPlaylists';
 import UserProfile from './components/UserProfile/UserProfile';
+import VerifiedUserProfile from './components/VerifiedUserProfile/VerifiedUserProfile';
 import { startTrackingPresence, updateCurrentPlayback } from './services/analyticsService';
 
 function AppContent() {
@@ -29,7 +30,9 @@ function AppContent() {
   const [showMyDownloads, setShowMyDownloads] = useState(false);
   const [showMyPlaylists, setShowMyPlaylists] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
+  const [showVerifiedProfile, setShowVerifiedProfile] = useState(false);
   const [selectedProfileUser, setSelectedProfileUser] = useState(null);
+  const [selectedVerifiedUserId, setSelectedVerifiedUserId] = useState(null);
   const isAdmin = currentUser?.email === ADMIN_EMAIL;
   const [selectedSection, setSelectedSection] = useState(null);
   const [selectedCassette, setSelectedCassette] = useState(null);
@@ -342,6 +345,27 @@ function AppContent() {
             setShowUserProfile(false);
           }}
         />
+      )}
+      
+      {/* صفحة البروفايل للمستخدمين الموثقين */}
+      {showVerifiedProfile && selectedVerifiedUserId && (
+        <div className="modal-overlay" onClick={() => {
+          setShowVerifiedProfile(false);
+          setSelectedVerifiedUserId(null);
+        }}>
+          <div className="modal-container verified-profile-modal" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="close-modal-btn"
+              onClick={() => {
+                setShowVerifiedProfile(false);
+                setSelectedVerifiedUserId(null);
+              }}
+            >
+              ✕
+            </button>
+            <VerifiedUserProfile userId={selectedVerifiedUserId} />
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { FaHeart, FaRegHeart, FaCheckCircle, FaShare } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaCheckCircle, FaShareAlt, FaFacebook, FaTwitter, FaWhatsapp, FaLink } from 'react-icons/fa';
 import { isFavorite, addToFavorites, removeFromFavorites } from '../../services/storageService';
 import { isCassetteDownloaded } from '../../services/downloadService';
-import { shareCassette, showShareFeedback } from '../../services/shareService';
+import { shareOnFacebook, shareOnTwitter, shareOnWhatsApp, copyShareLink } from '../../services/shareService';
+import { checkVerificationStatus } from '../../services/verificationService';
+import VerifiedBadge from '../VerifiedBadge/VerifiedBadge';
 import './AudioCard.css';
 
 function AudioCard({ cassette, isSelected, isPlaying, onClick }) {
   const [favorite, setFavorite] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
+  const [showShareMenu, setShowShareMenu] = useState(false);
 
   // فحص إذا كان في المفضلة والتحميلات عند التحميل
   useEffect(() => {
@@ -15,7 +19,28 @@ function AudioCard({ cassette, isSelected, isPlaying, onClick }) {
       setFavorite(isFavorite(cassette.id));
       setDownloaded(isCassetteDownloaded(cassette.id));
     }
+    
+    // فحص حالة التوثيق
+    if (cassette?.userEmail) {
+      checkVerificationStatus(cassette.userEmail).then(status => {
+        setIsVerified(status.isVerified);
+      });
+    }
   }, [cassette]);
+
+  // إغلاق قائمة المشاركة عند الضغط خارجها
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showShareMenu && !e.target.closest('.share-container')) {
+        setShowShareMenu(false);
+      }
+    };
+    
+    if (showShareMenu) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showShareMenu]);
 
   // إضافة/إزالة من المفضلة
   const handleFavoriteClick = (e) => {
@@ -32,11 +57,49 @@ function AudioCard({ cassette, isSelected, isPlaying, onClick }) {
     }
   };
 
-  // مشاركة الشريط
-  const handleShareClick = async (e) => {
+  // فتح/إغلاق قائمة المشاركة
+  const handleShareClick = (e) => {
     e.stopPropagation();
-    const result = await shareCassette(cassette);
-    showShareFeedback(result);
+    setShowShareMenu(!showShareMenu);
+  };
+
+  // المشاركة على فيسبوك
+  const handleFacebookShare = (e) => {
+    e.stopPropagation();
+    shareOnFacebook(cassette);
+    setShowShareMenu(false);
+  };
+
+  // المشاركة على تويتر
+  const handleTwitterShare = (e) => {
+    e.stopPropagation();
+    shareOnTwitter(cassette);
+    setShowShareMenu(false);
+  };
+
+  // المشاركة على واتساب
+  const handleWhatsAppShare = (e) => {
+    e.stopPropagation();
+    shareOnWhatsApp(cassette);
+    setShowShareMenu(false);
+  };
+
+  // نسخ الرابط
+  const handleCopyLink = async (e) => {
+    e.stopPropagation();
+    const success = await copyShareLink(cassette);
+    if (success) {
+      // عرض رسالة نجاح بصرية
+      const btn = e.currentTarget;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '✓ تم النسخ';
+      btn.style.background = 'rgba(76, 175, 80, 0.2)';
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.style.background = '';
+      }, 2000);
+    }
+    setShowShareMenu(false);
   };
 
   // تنسيق التاريخ
@@ -80,14 +143,49 @@ function AudioCard({ cassette, isSelected, isPlaying, onClick }) {
           </div>
         )}
 
-        {/* زر المشاركة */}
-        <button 
-          className="share-btn"
-          onClick={handleShareClick}
-          title="مشاركة الشريط"
-        >
-          <FaShare />
-        </button>
+        {/* زر المشاركة مع قائمة الخيارات */}
+        <div className="share-container">
+          <button 
+            className={`share-btn ${showShareMenu ? 'active' : ''}`}
+            onClick={handleShareClick}
+            title="مشاركة الشريط"
+          >
+            <FaShareAlt />
+          </button>
+          
+          {showShareMenu && (
+            <div className="share-menu">
+              <button 
+                className="share-option facebook"
+                onClick={handleFacebookShare}
+                title="مشاركة على فيسبوك"
+              >
+                <FaFacebook />
+              </button>
+              <button 
+                className="share-option twitter"
+                onClick={handleTwitterShare}
+                title="مشاركة على تويتر"
+              >
+                <FaTwitter />
+              </button>
+              <button 
+                className="share-option whatsapp"
+                onClick={handleWhatsAppShare}
+                title="مشاركة على واتساب"
+              >
+                <FaWhatsapp />
+              </button>
+              <button 
+                className="share-option copy"
+                onClick={handleCopyLink}
+                title="نسخ الرابط"
+              >
+                <FaLink />
+              </button>
+            </div>
+          )}
+        </div>
 
         <div className="screw screw-top-left"></div>
         <div className="screw screw-top-right"></div>
@@ -120,7 +218,10 @@ function AudioCard({ cassette, isSelected, isPlaying, onClick }) {
         </div>
 
         <div className="cassette-label">
-          <h4 className="label-title">{cassette.reciter || cassette.title}</h4>
+          <div className="label-title-container">
+            <h4 className="label-title">{cassette.reciter || cassette.title}</h4>
+            {isVerified && <VerifiedBadge size="small" />}
+          </div>
           {cassette.reciter && (
             <p className="label-subtitle">{cassette.title}</p>
           )}

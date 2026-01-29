@@ -324,6 +324,37 @@
   border-radius: var(--radius-md);
 }
 
+/* Supported Sources Hint */
+.supported-sources-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-primary);
+  flex-wrap: wrap;
+}
+
+.supported-sources-hint > span:first-child {
+  font-weight: 600;
+  color: #4caf50;
+}
+
+.source-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  background: rgba(139, 69, 19, 0.1);
+  border: 1px solid rgba(139, 69, 19, 0.3);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
 .audio-items-list {
   display: flex;
   flex-direction: column;

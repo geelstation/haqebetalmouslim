@@ -129,14 +129,27 @@ export const getAllCassettes = async () => {
 };
 
 // الحصول على شرايط المستخدم (كل الحالات)
-export const getUserCassettes = async (userId) => {
+export const getUserCassettes = async (userIdOrEmail) => {
   try {
-    console.log('🔍 getUserCassettes: جلب أشرطة المستخدم:', userId);
-    const q = query(
+    console.log('🔍 getUserCassettes: جلب أشرطة المستخدم:', userIdOrEmail);
+    
+    // محاولة البحث بـ createdBy أولاً
+    let q = query(
       collection(db, 'cassettes'), 
-      where('createdBy', '==', userId)
+      where('createdBy', '==', userIdOrEmail)
     );
-    const snapshot = await getDocs(q);
+    let snapshot = await getDocs(q);
+    
+    // إذا لم توجد نتائج، جرب البحث بـ userEmail
+    if (snapshot.empty) {
+      console.log('🔄 لا توجد نتائج بـ createdBy، جاري البحث بـ userEmail...');
+      q = query(
+        collection(db, 'cassettes'),
+        where('userEmail', '==', userIdOrEmail)
+      );
+      snapshot = await getDocs(q);
+    }
+    
     const cassettes = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()

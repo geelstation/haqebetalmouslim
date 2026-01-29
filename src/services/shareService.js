@@ -3,6 +3,49 @@
 // ===================================================
 
 /**
+ * مشاركة شريط على الفيسبوك
+ */
+export const shareOnFacebook = (cassette) => {
+  const url = encodeURIComponent(window.location.href);
+  const title = encodeURIComponent(`استمع إلى: ${cassette.title}`);
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${title}`;
+  window.open(facebookUrl, '_blank', 'width=600,height=400');
+};
+
+/**
+ * مشاركة شريط على تويتر
+ */
+export const shareOnTwitter = (cassette) => {
+  const url = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent(`استمع إلى: ${cassette.title}`);
+  const twitterUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+  window.open(twitterUrl, '_blank', 'width=600,height=400');
+};
+
+/**
+ * مشاركة شريط على واتساب
+ */
+export const shareOnWhatsApp = (cassette) => {
+  const url = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent(`استمع إلى: ${cassette.title}\n${url}`);
+  const whatsappUrl = `https://wa.me/?text=${text}`;
+  window.open(whatsappUrl, '_blank');
+};
+
+/**
+ * نسخ رابط الشريط
+ */
+export const copyShareLink = async (cassette) => {
+  try {
+    await navigator.clipboard.writeText(window.location.href);
+    return true;
+  } catch (error) {
+    console.error('خطأ في النسخ:', error);
+    return false;
+  }
+};
+
+/**
  * مشاركة شريط عبر Web Share API
  */
 export const shareCassette = async (cassette) => {
@@ -17,7 +60,6 @@ export const shareCassette = async (cassette) => {
     } else {
       // Fallback: نسخ الرابط
       await navigator.clipboard.writeText(window.location.href);
-      alert('✅ تم نسخ الرابط');
       return true;
     }
   } catch (error) {

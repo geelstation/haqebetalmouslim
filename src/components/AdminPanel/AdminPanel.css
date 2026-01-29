@@ -7,6 +7,276 @@
   position: relative;
 }
 
+/* قسم التوثيق */
+.verified-section {
+  width: 100%;
+  padding: 20px 0;
+}
+
+.verified-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid rgba(139, 69, 19, 0.3);
+}
+
+.verified-section .section-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 24px;
+  color: var(--accent-color);
+  margin: 0;
+}
+
+.add-verified-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #1da1f2, #0d8bd9);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(29, 161, 242, 0.3);
+}
+
+.add-verified-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(29, 161, 242, 0.4);
+  background: linear-gradient(135deg, #0d8bd9, #1da1f2);
+}
+
+.verified-users-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.verified-user-card {
+  background: linear-gradient(135deg, rgba(29, 161, 242, 0.05), rgba(29, 161, 242, 0.02));
+  border: 2px solid rgba(29, 161, 242, 0.3);
+  border-radius: 20px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.verified-user-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #1da1f2, #00c6ff);
+}
+
+.verified-user-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(29, 161, 242, 0.25);
+  border-color: rgba(29, 161, 242, 0.5);
+}
+
+.verified-user-card .user-info {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.verified-user-card .user-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #1da1f2;
+  flex-shrink: 0;
+}
+
+.verified-user-card .user-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.verified-user-card .user-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.verified-user-card .user-email {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.verified-user-card .user-bio {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.6;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+  margin-top: 8px;
+}
+
+.verified-user-card .user-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.verified-user-card .social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(139, 69, 19, 0.1);
+  border: 1px solid rgba(139, 69, 19, 0.3);
+  border-radius: 20px;
+  color: var(--accent-color);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.verified-user-card .social-link:hover {
+  background: rgba(139, 69, 19, 0.2);
+  border-color: rgba(139, 69, 19, 0.5);
+  transform: translateY(-2px);
+}
+
+.verified-user-card .user-meta {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.verified-user-card .verified-date {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.verified-user-card .unverify-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px;
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 10px;
+  color: #f44336;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.verified-user-card .unverify-btn:hover {
+  background: rgba(244, 67, 54, 0.2);
+  border-color: rgba(244, 67, 54, 0.5);
+}
+
+/* Modal التوثيق */
+.verify-modal {
+  width: 600px;
+  max-width: 95vw;
+}
+
+.verify-modal .form-group {
+  margin-bottom: 20px;
+}
+
+.verify-modal .form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.verify-modal .form-group input,
+.verify-modal .form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.verify-modal .form-group input:focus,
+.verify-modal .form-group textarea:focus {
+  outline: none;
+  border-color: #1da1f2;
+  box-shadow: 0 0 0 3px rgba(29, 161, 242, 0.1);
+}
+
+.verify-modal .modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.verify-modal .cancel-btn {
+  padding: 10px 24px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  background: transparent;
+  color: var(--text-primary);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.verify-modal .cancel-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.verify-modal .verify-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #1da1f2, #0d8bd9);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.verify-modal .verify-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(29, 161, 242, 0.3);
+}
+
 /* Modal للزوار الفريدين */
 .all-visitors-modal {
   max-width: 95vw;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaCheck, FaTimes, FaEdit, FaEye, FaTrash, FaBullhorn, FaUsers } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaEdit, FaEye, FaTrash, FaBullhorn, FaUsers, FaCheckCircle, FaUserCheck } from 'react-icons/fa';
 import { 
   getPendingCassettes, 
   getAllCassettes,
@@ -10,9 +10,11 @@ import {
   deleteCassette 
 } from '../../services/cassetteService';
 import { getAppSettings, updateTopBarMessage } from '../../services/settingsService';
+import { getAllVerifiedUsers, verifyUser, unverifyUser } from '../../services/verificationService';
 import './AdminPanel.css';
 import { getStats } from '../../services/analyticsService';
 import OnlineUsers from '../OnlineUsers/OnlineUsers';
+import VerifiedBadge from '../VerifiedBadge/VerifiedBadge';
 
 function AdminPanel({ isAdmin, currentUser }) {
   const [pendingCassettes, setPendingCassettes] = useState([]);
@@ -31,6 +33,17 @@ function AdminPanel({ isAdmin, currentUser }) {
   const [allVisitorsData, setAllVisitorsData] = useState([]);
   const [showListenersModal, setShowListenersModal] = useState(false);
   const [currentListeners, setCurrentListeners] = useState([]);
+  const [verifiedUsers, setVerifiedUsers] = useState([]);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [verifyEmail, setVerifyEmail] = useState('');
+  const [verifyData, setVerifyData] = useState({
+    displayName: '',
+    bio: '',
+    website: '',
+    youtube: '',
+    facebook: '',
+    twitter: ''
+  });
 
   // دالة تعريب النصوص
   const translateToArabic = (text) => {
@@ -136,6 +149,7 @@ function AdminPanel({ isAdmin, currentUser }) {
       loadAllCassettes();
       loadTopBarMessage();
       loadStats();
+      loadVerifiedUsers();
       const interval = setInterval(loadStats, 30000);
       return () => clearInterval(interval);
     }
@@ -201,6 +215,52 @@ function AdminPanel({ isAdmin, currentUser }) {
     if (minutes > 0) result += `${minutes} دقيقة `;
     if (secs > 0 || !result) result += `${secs} ثانية`;
     return result.trim();
+  };
+  
+  const loadVerifiedUsers = async () => {
+    try {
+      const users = await getAllVerifiedUsers();
+      setVerifiedUsers(users);
+    } catch (e) {
+      console.error('خطأ في تحميل المستخدمين الموثقين:', e);
+    }
+  };
+  
+  const handleVerifyUser = async () => {
+    if (!verifyEmail) {
+      alert('الرجاء إدخال البريد الإلكتروني');
+      return;
+    }
+    
+    try {
+      await verifyUser(verifyEmail, currentUser.uid, verifyData);
+      alert('تم توثيق المستخدم بنجاح!');
+      setShowVerifyModal(false);
+      setVerifyEmail('');
+      setVerifyData({
+        displayName: '',
+        bio: '',
+        website: '',
+        youtube: '',
+        facebook: '',
+        twitter: ''
+      });
+      loadVerifiedUsers();
+    } catch (e) {
+      alert('فشل توثيق المستخدم: ' + e.message);
+    }
+  };
+  
+  const handleUnverifyUser = async (userId) => {
+    if (confirm('هل أنت متأكد من إلغاء توثيق هذا المستخدم؟')) {
+      try {
+        await unverifyUser(userId);
+        alert('تم إلغاء التوثيق');
+        loadVerifiedUsers();
+      } catch (e) {
+        alert('فشل إلغاء التوثيق: ' + e.message);
+      }
+    }
   };
 
   const loadPendingCassettes = async () => {
@@ -657,16 +717,16 @@ function AdminPanel({ isAdmin, currentUser }) {
             أشرطتي ({myCassettes.length})
           </button>
           <button 
-            className={`tab-btn ${viewMode === 'mine' ? 'active' : ''}`}
-            onClick={() => setViewMode('mine')}
-          >
-            أشرطتي ({myCassettes.length})
-          </button>
-          <button 
             className={`tab-btn ${viewMode === 'online' ? 'active' : ''}`}
             onClick={() => setViewMode('online')}
           >
             <FaUsers /> المتواجدون الآن
+          </button>
+          <button 
+            className={`tab-btn ${viewMode === 'verified' ? 'active' : ''}`}
+            onClick={() => setViewMode('verified')}
+          >
+            <FaUserCheck /> التوثيق ({verifiedUsers.length})
           </button>
         </div>
       </div>
@@ -762,6 +822,78 @@ function AdminPanel({ isAdmin, currentUser }) {
 
       {viewMode === 'online' ? (
         <OnlineUsers />
+      ) : viewMode === 'verified' ? (
+        <div className="verified-section">
+          <div className="section-header">
+            <h2><FaUserCheck /> إدارة التوثيق</h2>
+            <button 
+              className="add-verified-btn"
+              onClick={() => setShowVerifyModal(true)}
+            >
+              <FaCheckCircle /> توثيق مستخدم جديد
+            </button>
+          </div>
+
+          <div className="verified-users-list">
+            {verifiedUsers.length === 0 ? (
+              <div className="no-data">لا توجد حسابات موثقة</div>
+            ) : (
+              verifiedUsers.map(user => (
+                <div key={user.userId} className="verified-user-card">
+                  <div className="user-info">
+                    <img src={user.photoURL || '/default-avatar.png'} alt={user.displayName} className="user-avatar" />
+                    <div className="user-details">
+                      <div className="user-name">
+                        {user.displayName}
+                        <VerifiedBadge size="medium" showText={true} />
+                      </div>
+                      <div className="user-email">{user.email}</div>
+                      {user.bio && <div className="user-bio">{user.bio}</div>}
+                    </div>
+                  </div>
+                  
+                  {(user.website || user.youtube || user.facebook || user.twitter) && (
+                    <div className="user-social">
+                      {user.website && (
+                        <a href={user.website} target="_blank" rel="noopener noreferrer" className="social-link">
+                          🌐 الموقع
+                        </a>
+                      )}
+                      {user.youtube && (
+                        <a href={user.youtube} target="_blank" rel="noopener noreferrer" className="social-link">
+                          📺 يوتيوب
+                        </a>
+                      )}
+                      {user.facebook && (
+                        <a href={user.facebook} target="_blank" rel="noopener noreferrer" className="social-link">
+                          📘 فيسبوك
+                        </a>
+                      )}
+                      {user.twitter && (
+                        <a href={user.twitter} target="_blank" rel="noopener noreferrer" className="social-link">
+                          🐦 تويتر
+                        </a>
+                      )}
+                    </div>
+                  )}
+                  
+                  <div className="user-meta">
+                    <span className="verified-date">
+                      تم التوثيق: {new Date(user.verifiedAt).toLocaleDateString('ar-EG')}
+                    </span>
+                  </div>
+                  
+                  <button 
+                    className="unverify-btn"
+                    onClick={() => handleUnverifyUser(user.userId)}
+                  >
+                    <FaTimes /> إلغاء التوثيق
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       ) : currentCassettes.length === 0 ? (
         <div className="no-cassettes">
           <p>✅ لا توجد شرايط</p>
@@ -1113,6 +1245,101 @@ function AdminPanel({ isAdmin, currentUser }) {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal لتوثيق مستخدم جديد */}
+      {showVerifyModal && (
+        <div className="modal-overlay" onClick={() => setShowVerifyModal(false)}>
+          <div className="modal-container verify-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2><FaCheckCircle /> توثيق مستخدم جديد</h2>
+              <button className="close-btn" onClick={() => setShowVerifyModal(false)}>
+                <FaTimes />
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="form-group">
+                <label>البريد الإلكتروني للمستخدم:</label>
+                <input 
+                  type="email"
+                  value={verifyEmail}
+                  onChange={(e) => setVerifyEmail(e.target.value)}
+                  placeholder="example@email.com"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>الاسم الظاهر:</label>
+                <input 
+                  type="text"
+                  value={verifyData.displayName}
+                  onChange={(e) => setVerifyData({...verifyData, displayName: e.target.value})}
+                  placeholder="الاسم الكامل"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>نبذة تعريفية:</label>
+                <textarea 
+                  value={verifyData.bio}
+                  onChange={(e) => setVerifyData({...verifyData, bio: e.target.value})}
+                  placeholder="نبذة عن المستخدم..."
+                  rows="3"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>🌐 الموقع الشخصي:</label>
+                <input 
+                  type="url"
+                  value={verifyData.website}
+                  onChange={(e) => setVerifyData({...verifyData, website: e.target.value})}
+                  placeholder="https://example.com"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>📺 قناة يوتيوب:</label>
+                <input 
+                  type="url"
+                  value={verifyData.youtube}
+                  onChange={(e) => setVerifyData({...verifyData, youtube: e.target.value})}
+                  placeholder="https://youtube.com/@username"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>📘 فيسبوك:</label>
+                <input 
+                  type="url"
+                  value={verifyData.facebook}
+                  onChange={(e) => setVerifyData({...verifyData, facebook: e.target.value})}
+                  placeholder="https://facebook.com/username"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>🐦 تويتر:</label>
+                <input 
+                  type="url"
+                  value={verifyData.twitter}
+                  onChange={(e) => setVerifyData({...verifyData, twitter: e.target.value})}
+                  placeholder="https://twitter.com/username"
+                />
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              <button className="cancel-btn" onClick={() => setShowVerifyModal(false)}>
+                إلغاء
+              </button>
+              <button className="verify-btn" onClick={handleVerifyUser}>
+                <FaCheckCircle /> توثيق الحساب
+              </button>
             </div>
           </div>
         </div>

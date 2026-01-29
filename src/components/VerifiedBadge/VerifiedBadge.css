@@ -1,0 +1,42 @@
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #1da1f2;
+  vertical-align: middle;
+}
+
+.verified-badge.small {
+  font-size: 12px;
+}
+
+.verified-badge.medium {
+  font-size: 16px;
+}
+
+.verified-badge.large {
+  font-size: 20px;
+}
+
+.verified-icon {
+  filter: drop-shadow(0 0 3px rgba(29, 161, 242, 0.5));
+  animation: verify-pulse 2s ease-in-out infinite;
+}
+
+@keyframes verify-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 3px rgba(29, 161, 242, 0.5));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 6px rgba(29, 161, 242, 0.8));
+  }
+}
+
+.verified-text {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { SECTIONS_DATA } from '../../data/sectionsData';
 import { createCassette } from '../../services/cassetteService';
 import { ADMIN_EMAIL } from '../../firebase/config';
+import { isValidAudioUrl, prepareAudioUrl } from '../../services/audioUrlService';
 import './AddCassetteModal.css';
 
 function AddCassetteModal({ isOpen, onClose, onCassetteAdded }) {
@@ -109,12 +110,20 @@ function AddCassetteModal({ isOpen, onClose, onCassetteAdded }) {
     }
 
     // التحقق من الروابط
-    const validItems = audioItems.filter(item => 
-      item.name.trim() && item.url.trim()
-    );
+    const validItems = audioItems.filter(item => {
+      const hasName = item.name.trim();
+      const hasUrl = item.url.trim();
+      const isValid = hasUrl && isValidAudioUrl(item.url);
+      
+      if (hasUrl && !isValid) {
+        console.warn('⚠️ رابط غير صالح:', item.url);
+      }
+      
+      return hasName && isValid;
+    });
 
     if (validItems.length === 0) {
-      setError('الرجاء إضافة رابط صوتي واحد على الأقل');
+      setError('الرجاء إضافة رابط صوتي صحيح واحد على الأقل (يدعم archive.org وmp3quran.net وغيرها)');
       return;
     }
     
@@ -126,7 +135,7 @@ function AddCassetteModal({ isOpen, onClose, onCassetteAdded }) {
       items: validItems.map((item, index) => ({
         id: `item-${Date.now()}-${index}`,
         title: item.name.trim(),
-        audioUrl: item.url.trim(),
+        audioUrl: prepareAudioUrl(item.url.trim()), // معالجة الرابط
         ayah: null
       })),
       isCustom: true,
@@ -336,6 +345,14 @@ function AddCassetteModal({ isOpen, onClose, onCassetteAdded }) {
                 <div className="form-group audio-items-section">
                 <label>الروابط الصوتية:</label>
                 
+                <div className="supported-sources-hint">
+                  <span>✅ يدعم:</span>
+                  <span className="source-tag">archive.org</span>
+                  <span className="source-tag">mp3quran.net</span>
+                  <span className="source-tag">everyayah.com</span>
+                  <span className="source-tag">وغيرها</span>
+                </div>
+                
                 <div className="audio-items-list">
                   {audioItems.map((item, index) => (
                     <div key={index} className="audio-item-row">
@@ -351,7 +368,7 @@ function AddCassetteModal({ isOpen, onClose, onCassetteAdded }) {
                       
                       <input
                         type="url"
-                        placeholder="https://example.com/audio.mp3"
+                        placeholder="https://archive.org/download/collection/file.mp3"
                         value={item.url}
                         onChange={(e) => updateAudioItem(index, 'url', e.target.value)}
                         className="audio-url-input"
