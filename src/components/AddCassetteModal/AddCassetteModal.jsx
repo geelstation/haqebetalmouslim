@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaTimes, FaPlus, FaTrash } from 'react-icons/fa';
+import { FaTimes, FaPlus, FaTrash, FaExchangeAlt } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
 import { SECTIONS_DATA } from '../../data/sectionsData';
 import { createCassette } from '../../services/cassetteService';
@@ -59,6 +59,23 @@ function AddCassetteModal({ isOpen, onClose, onCassetteAdded }) {
     const newItems = [...audioItems];
     newItems[index][field] = value;
     setAudioItems(newItems);
+  };
+  
+  // تحويل رابط archive.org تلقائياً
+  const convertArchiveUrl = (index) => {
+    const currentUrl = audioItems[index].url;
+    if (!currentUrl) return;
+    
+    const convertedUrl = prepareAudioUrl(currentUrl);
+    
+    if (convertedUrl !== currentUrl) {
+      const newItems = [...audioItems];
+      newItems[index].url = convertedUrl;
+      setAudioItems(newItems);
+      console.log('✅ تم تحويل الرابط:', { من: currentUrl, إلى: convertedUrl });
+    } else {
+      console.log('ℹ️ الرابط بالفعل بالصيغة الصحيحة');
+    }
   };
   
   // توليد القرآن كاملاً (AI Mode)
@@ -366,13 +383,24 @@ function AddCassetteModal({ isOpen, onClose, onCassetteAdded }) {
                         className="audio-name-input"
                       />
                       
-                      <input
-                        type="url"
-                        placeholder="https://archive.org/download/collection/file.mp3"
-                        value={item.url}
-                        onChange={(e) => updateAudioItem(index, 'url', e.target.value)}
-                        className="audio-url-input"
-                      />
+                      <div className="url-input-wrapper">
+                        <input
+                          type="url"
+                          placeholder="https://archive.org/download/collection/file.mp3"
+                          value={item.url}
+                          onChange={(e) => updateAudioItem(index, 'url', e.target.value)}
+                          className="audio-url-input"
+                        />
+                        <button
+                          type="button"
+                          className="convert-url-btn"
+                          onClick={() => convertArchiveUrl(index)}
+                          title="تحويل رابط archive.org من /details/ إلى /download/"
+                        >
+                          <FaExchangeAlt />
+                          <span>تحويل</span>
+                        </button>
+                      </div>
                       
                       {audioItems.length > 1 && (
                         <button

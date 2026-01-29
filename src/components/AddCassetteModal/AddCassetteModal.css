@@ -403,6 +403,50 @@
   border-color: var(--accent-color);
 }
 
+/* URL Input Wrapper with Convert Button */
+.url-input-wrapper {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  flex: 2;
+}
+
+.url-input-wrapper .audio-url-input {
+  flex: 1;
+}
+
+.convert-url-btn {
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.convert-url-btn:hover {
+  background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.convert-url-btn:active {
+  transform: translateY(0);
+}
+
+.convert-url-btn svg {
+  font-size: 14px;
+}
+
 .remove-item-btn {
   padding: 8px;
   background: transparent;
