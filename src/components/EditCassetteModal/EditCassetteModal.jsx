@@ -183,13 +183,17 @@ function EditCassetteModal({ isOpen, onClose, cassette, onCassetteUpdated }) {
                 ))}
               </div>
 
-              <button
-                type="button"
-                onClick={addAudioItem}
-                className="add-item-btn"
-              >
-                <FaPlus /> إضافة ملف آخر
-              </button>
+              {/* زر إضافة ملف جديد */}
+              <div className="add-item-section">
+                <p className="add-item-hint">💡 لإضافة روابط إضافية، اضغط على الزر أدناه:</p>
+                <button
+                  type="button"
+                  onClick={addAudioItem}
+                  className="add-item-btn"
+                >
+                  <FaPlus /> ➕ إضافة رابط جديد ➕
+                </button>
+              </div>
             </div>
 
             {/* رسالة الخطأ */}

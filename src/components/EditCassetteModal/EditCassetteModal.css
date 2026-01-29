@@ -146,6 +146,9 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 3px dashed rgba(39, 174, 96, 0.3);
 }
 
 .audio-item {
@@ -216,28 +219,49 @@
   cursor: not-allowed;
 }
 
+/* Add Item Section */
+.add-item-section {
+  margin-top: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(39, 174, 96, 0.08) 0%, rgba(34, 153, 84, 0.05) 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(39, 174, 96, 0.2);
+}
+
+.add-item-hint {
+  margin: 0 0 16px 0;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.5);
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: 2px solid rgba(39, 174, 96, 0.3);
+}
+
 /* Add Item Button */
 .add-item-btn {
   width: 100%;
-  padding: 20px;
+  padding: 24px;
   background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
   color: white;
-  border: none;
-  border-radius: 16px;
-  font-size: 18px;
-  font-weight: 800;
+  border: 3px solid #1e8449;
+  border-radius: 18px;
+  font-size: 20px;
+  font-weight: 900;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 16px;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(39, 174, 96, 0.4);
-  margin-top: 16px;
+  box-shadow: 0 10px 25px rgba(39, 174, 96, 0.5);
+  margin-top: 0;
   position: relative;
   overflow: hidden;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
 }
 
 .add-item-btn::before {
