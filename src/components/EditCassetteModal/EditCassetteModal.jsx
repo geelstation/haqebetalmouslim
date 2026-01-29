@@ -17,10 +17,16 @@ function EditCassetteModal({ isOpen, onClose, cassette, onCassetteUpdated }) {
       setCassetteTitle(cassette.title || '');
       setAudioItems(
         cassette.items && cassette.items.length > 0
-          ? cassette.items.map(item => ({
-              name: item.title || '',
-              url: item.audioUrl || ''
-            }))
+          ? cassette.items.map(item => {
+              // تحويل الرابط تلقائياً من /details/ إلى /download/ عند التحميل
+              const originalUrl = item.audioUrl || '';
+              const convertedUrl = prepareAudioUrl(originalUrl);
+              console.log('🔄 تحويل الرابط:', { original: originalUrl, converted: convertedUrl });
+              return {
+                name: item.title || '',
+                url: convertedUrl
+              };
+            })
           : [{ name: '', url: '' }]
       );
     }

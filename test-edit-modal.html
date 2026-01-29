@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار زر الإضافة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 40px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #16213e;
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid #8b4513;
+        }
+
+        h1 {
+            text-align: center;
+            color: #8b4513;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            background: #0f3460;
+            border: 2px solid #533f2e;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        input::placeholder {
+            color: #999;
+        }
+
+        .supported-sources-hint {
+            background: rgba(76, 175, 80, 0.12);
+            border: 2px dashed rgba(76, 175, 80, 0.4);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .supported-sources-hint span:first-child {
+            font-weight: 700;
+            color: #4caf50;
+        }
+
+        .source-tag {
+            background: rgba(139, 69, 19, 0.12);
+            border: 1px solid rgba(139, 69, 19, 0.35);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .audio-items {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 3px dashed rgba(39, 174, 96, 0.3);
+        }
+
+        .audio-item {
+            display: grid;
+            grid-template-columns: 1.2fr 2fr auto;
+            gap: 14px;
+            align-items: center;
+            padding: 16px;
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            border-radius: 14px;
+            border: 2px solid #533f2e;
+        }
+
+        .remove-btn {
+            background: #c0392b;
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .remove-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* القسم الخاص بزر الإضافة */
+        .add-item-section {
+            margin-top: 24px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.08) 0%, rgba(34, 153, 84, 0.05) 100%);
+            border-radius: 16px;
+            border: 2px solid rgba(39, 174, 96, 0.2);
+        }
+
+        .add-item-hint {
+            margin: 0 0 16px 0;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(39, 174, 96, 0.3);
+        }
+
+        /* زر الإضافة - أخضر كبير واضح جداً */
+        .add-item-btn {
+            width: 100%;
+            padding: 24px;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            border: 3px solid #1e8449;
+            border-radius: 18px;
+            font-size: 20px;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(39, 174, 96, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .add-item-btn:hover {
+            background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 32px rgba(39, 174, 96, 0.6);
+        }
+
+        .add-item-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .counter {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #4caf50;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 اختبار زر "إضافة رابط جديد"</h1>
+
+        <div class="form-group">
+            <label>اسم الشريط:</label>
+            <input type="text" placeholder="مثال: تفسير الشعراوي - كامل" value="تفسير الشعراوي - كامل" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>الملفات الصوتية:</label>
+            <div class="supported-sources-hint">
+                <span>✅ يدعم:</span>
+                <span class="source-tag">archive.org</span>
+                <span class="source-tag">mp3quran.net</span>
+                <span class="source-tag">everyayah.com</span>
+                <span class="source-tag">وغيرها</span>
+            </div>
+            
+            <div class="audio-items" id="audioItems">
+                <div class="audio-item">
+                    <input type="text" placeholder="اسم الملف" value="مقدمة التفسير">
+                    <input type="url" placeholder="https://archive.org/download/..." value="https://archive.org/details/Khwater.El-Sharawy.Fi.Tafsir.EL-Quran-Karim-Up-By-mUSLEm/000_Intro.mp3">
+                    <button class="remove-btn" disabled>🗑</button>
+                </div>
+            </div>
+
+            <!-- زر الإضافة الكبير -->
+            <div class="add-item-section">
+                <p class="add-item-hint">💡 لإضافة روابط إضافية، اضغط على الزر أدناه:</p>
+                <button class="add-item-btn" onclick="addNewItem()">
+                    ➕ إضافة رابط جديد ➕
+                </button>
+            </div>
+        </div>
+
+        <div class="counter" id="counter">عدد الملفات: 1</div>
+    </div>
+
+    <script>
+        let itemCount = 1;
+
+        function addNewItem() {
+            itemCount++;
+            const container = document.getElementById('audioItems');
+            
+            const newItem = document.createElement('div');
+            newItem.className = 'audio-item';
+            newItem.innerHTML = `
+                <input type="text" placeholder="اسم الملف (مثال: الآية 1-10)">
+                <input type="url" placeholder="https://archive.org/download/collection/file.mp3">
+                <button class="remove-btn" onclick="removeItem(this)">🗑</button>
+            `;
+            
+            container.appendChild(newItem);
+            
+            // تحديث العداد
+            document.getElementById('counter').textContent = `عدد الملفات: ${itemCount}`;
+            
+            // رسالة في console
+            console.log('✅ تمت الإضافة! العدد الجديد:', itemCount);
+            
+            // تأثير بصري
+            newItem.style.opacity = '0';
+            newItem.style.transform = 'translateY(-20px)';
+            setTimeout(() => {
+                newItem.style.transition = 'all 0.3s ease';
+                newItem.style.opacity = '1';
+                newItem.style.transform = 'translateY(0)';
+            }, 10);
+        }
+
+        function removeItem(btn) {
+            if (itemCount > 1) {
+                itemCount--;
+                btn.closest('.audio-item').remove();
+                document.getElementById('counter').textContent = `عدد الملفات: ${itemCount}`;
+                console.log('🗑 تم الحذف! العدد الجديد:', itemCount);
+            }
+        }
+    </script>
+</body>
+</html>
