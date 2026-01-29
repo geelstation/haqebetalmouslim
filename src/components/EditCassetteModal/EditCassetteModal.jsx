@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaPlus, FaTrash } from 'react-icons/fa';
 import { updateCassette } from '../../services/cassetteService';
+import { isValidAudioUrl, prepareAudioUrl } from '../../services/audioUrlService';
 import './EditCassetteModal.css';
 
 function EditCassetteModal({ isOpen, onClose, cassette, onCassetteUpdated }) {
@@ -57,12 +58,20 @@ function EditCassetteModal({ isOpen, onClose, cassette, onCassetteUpdated }) {
     }
 
     // التحقق من الروابط
-    const validItems = audioItems.filter(item => 
-      item.name.trim() && item.url.trim()
-    );
+    const validItems = audioItems.filter(item => {
+      const hasName = item.name.trim();
+      const hasUrl = item.url.trim();
+      const isValid = hasUrl ? isValidAudioUrl(item.url.trim()) : false;
+      
+      if (hasUrl && !isValid) {
+        console.warn('⚠️ رابط غير صالح:', item.url);
+      }
+      
+      return hasName && isValid;
+    });
 
     if (validItems.length === 0) {
-      setError('⚠️ الرجاء إضافة ملف صوتي واحد على الأقل');
+      setError('⚠️ الرجاء إضافة ملف صوتي صحيح واحد على الأقل (يدعم archive.org وmp3quran.net وغيرها)');
       return;
     }
 
@@ -73,7 +82,7 @@ function EditCassetteModal({ isOpen, onClose, cassette, onCassetteUpdated }) {
         items: validItems.map((item, index) => ({
           id: `item-${Date.now()}-${index}`,
           title: item.name.trim(),
-          audioUrl: item.url.trim(),
+          audioUrl: prepareAudioUrl(item.url.trim()),
           ayah: null
         }))
       });
@@ -137,6 +146,13 @@ function EditCassetteModal({ isOpen, onClose, cassette, onCassetteUpdated }) {
             {/* الملفات الصوتية */}
             <div className="form-group">
               <label>الملفات الصوتية:</label>
+              <div className="supported-sources-hint">
+                <span>✅ يدعم:</span>
+                <span className="source-tag">archive.org</span>
+                <span className="source-tag">mp3quran.net</span>
+                <span className="source-tag">everyayah.com</span>
+                <span className="source-tag">وغيرها</span>
+              </div>
               <div className="audio-items">
                 {audioItems.map((item, index) => (
                   <div key={index} className="audio-item">
@@ -151,7 +167,7 @@ function EditCassetteModal({ isOpen, onClose, cassette, onCassetteUpdated }) {
                       type="url"
                       value={item.url}
                       onChange={(e) => updateAudioItem(index, 'url', e.target.value)}
-                      placeholder="رابط الملف الصوتي (URL)"
+                      placeholder="https://archive.org/download/collection/file.mp3"
                       className="audio-input"
                     />
                     <button
