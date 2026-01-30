@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   // استخدام / للـ Netlify و GitHub Pages مع custom domain
   // للـ GitHub Pages بدون custom domain، استخدم: '/haqebetalmouslim/'
-  base: '/',
+  base: '/haqebetalmouslim/',
   server: {
     port: 5173,
     host: true
