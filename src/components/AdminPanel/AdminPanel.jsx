@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FaCheck, FaTimes, FaEdit, FaEye, FaTrash, FaBullhorn, FaUsers, FaCheckCircle, FaUserCheck, FaUserFriends } from 'react-icons/fa';
+import { FaCheck, FaTimes, FaEdit, FaEye, FaTrash, FaBullhorn, FaUsers, FaCheckCircle, FaUserCheck, FaUserFriends, FaSearch } from 'react-icons/fa';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { 
   getPendingCassettes, 
   getAllCassettes,
@@ -49,6 +51,11 @@ function AdminPanel({ isAdmin, currentUser }) {
   const [allUsers, setAllUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showUserDetailsModal, setShowUserDetailsModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCountry, setFilterCountry] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all'); // all | online | offline
+  const [filterDevice, setFilterDevice] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // دالة تعريب النصوص
   const translateToArabic = (text) => {
@@ -237,13 +244,14 @@ function AdminPanel({ isAdmin, currentUser }) {
   
   const handleVerifyUser = async () => {
     if (!verifyEmail) {
-      alert('الرجاء إدخال البريد الإلكتروني');
+      toast.warning('الرجاء إدخال البريد الإلكتروني', { position: 'top-center', theme: 'colored' });
       return;
     }
     
     try {
+      setIsLoading(true);
       await verifyUser(verifyEmail, currentUser.uid, verifyData);
-      alert('تم توثيق المستخدم بنجاح!');
+      toast.success('تم توثيق المستخدم بنجاح!', { position: 'top-center', theme: 'colored' });
       setShowVerifyModal(false);
       setVerifyEmail('');
       setVerifyData({
@@ -256,18 +264,23 @@ function AdminPanel({ isAdmin, currentUser }) {
       });
       loadVerifiedUsers();
     } catch (e) {
-      alert('فشل توثيق المستخدم: ' + e.message);
+      toast.error('فشل توثيق المستخدم: ' + e.message, { position: 'top-center', theme: 'colored' });
+    } finally {
+      setIsLoading(false);
     }
   };
   
   const handleUnverifyUser = async (userId) => {
     if (confirm('هل أنت متأكد من إلغاء توثيق هذا المستخدم؟')) {
       try {
+        setIsLoading(true);
         await unverifyUser(userId);
-        alert('تم إلغاء التوثيق');
+        toast.info('تم إلغاء التوثيق', { position: 'top-center', theme: 'colored' });
         loadVerifiedUsers();
       } catch (e) {
-        alert('فشل إلغاء التوثيق: ' + e.message);
+        toast.error('فشل إلغاء التوثيق: ' + e.message, { position: 'top-center', theme: 'colored' });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -335,13 +348,16 @@ function AdminPanel({ isAdmin, currentUser }) {
   const handleApprove = async (cassetteId) => {
     if (window.confirm('هل تريد الموافقة على هذا الشريط؟')) {
       try {
+        setIsLoading(true);
         await approveCassette(cassetteId);
-        alert('✅ تم الموافقة على الشريط');
+        toast.success('✅ تم الموافقة على الشريط', { position: 'top-center', theme: 'colored' });
         loadPendingCassettes();
         loadAllCassettes();
         loadMyCassettes();
       } catch (error) {
-        alert('❌ فشل في الموافقة');
+        toast.error('❌ فشل في الموافقة', { position: 'top-center', theme: 'colored' });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -350,13 +366,16 @@ function AdminPanel({ isAdmin, currentUser }) {
     const reason = prompt('اذكر سبب الرفض (اختياري):');
     if (reason !== null) {
       try {
+        setIsLoading(true);
         await rejectCassette(cassetteId, reason);
-        alert('❌ تم رفض الشريط');
+        toast.info('❌ تم رفض الشريط', { position: 'top-center', theme: 'colored' });
         loadPendingCassettes();
         loadAllCassettes();
         loadMyCassettes();
       } catch (error) {
-        alert('❌ فشل في الرفض');
+        toast.error('❌ فشل في الرفض', { position: 'top-center', theme: 'colored' });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -373,45 +392,54 @@ function AdminPanel({ isAdmin, currentUser }) {
 
   const handleSaveEdit = async () => {
     try {
+      setIsLoading(true);
       await updateCassette(selectedCassette.id, editData);
-      alert('✅ تم التعديل بنجاح');
+      toast.success('✅ تم التعديل بنجاح', { position: 'top-center', theme: 'colored' });
       setEditMode(false);
       setSelectedCassette(null);
       loadPendingCassettes();
       loadAllCassettes();
       loadMyCassettes();
     } catch (error) {
-      alert('❌ فشل في التعديل');
+      toast.error('❌ فشل في التعديل', { position: 'top-center', theme: 'colored' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDelete = async (cassetteId) => {
     if (window.confirm('هل تريد حذف هذا الشريط نهائياً؟')) {
       try {
+        setIsLoading(true);
         await deleteCassette(cassetteId);
-        alert('🗑️ تم الحذف');
+        toast.success('🗑️ تم الحذف', { position: 'top-center', theme: 'colored' });
         loadPendingCassettes();
         loadAllCassettes();
         loadMyCassettes();
       } catch (error) {
-        alert('❌ فشل في الحذف');
+        toast.error('❌ فشل في الحذف', { position: 'top-center', theme: 'colored' });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
   const handleSaveMessage = async () => {
     try {
+      setIsLoading(true);
       console.log('🔄 محاولة تحديث الرسائل:', topBarMessages);
       await updateTopBarMessage(topBarMessages, separatorIcon);
       console.log('✅ تم التحديث بنجاح');
-      alert('✅ تم تحديث الرسائل بنجاح');
+      toast.success('✅ تم تحديث الرسائل بنجاح', { position: 'top-center', theme: 'colored' });
       setIsEditingMessage(false);
       setCurrentMessage('');
       await loadTopBarMessage();
     } catch (error) {
       console.error('❌ خطأ في تحديث الرسائل:', error);
       console.error('تفاصيل الخطأ:', error.message);
-      alert(`❌ فشل في تحديث الرسائل: ${error.message}`);
+      toast.error(`❌ فشل في تحديث الرسائل: ${error.message}`, { position: 'top-center', theme: 'colored' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -425,6 +453,50 @@ function AdminPanel({ isAdmin, currentUser }) {
   const handleRemoveMessage = (index) => {
     setTopBarMessages(topBarMessages.filter((_, i) => i !== index));
   };
+
+  
+  // دالة فلترة المستخدمين
+  const getFilteredUsers = () => {
+    return allUsers.filter(user => {
+      // فلترة البحث
+      if (searchTerm) {
+        const search = searchTerm.toLowerCase();
+        const name = (user.displayName || '').toLowerCase();
+        const email = (user.email || '').toLowerCase();
+        if (!name.includes(search) && !email.includes(search)) {
+          return false;
+        }
+      }
+
+      // فلترة الحالة
+      if (filterStatus !== 'all') {
+        const isOnline = user.isOnline && user.lastSeen?.toDate && 
+          (Date.now() - user.lastSeen.toDate().getTime()) < 120000;
+        if (filterStatus === 'online' && !isOnline) return false;
+        if (filterStatus === 'offline' && isOnline) return false;
+      }
+
+      // فلترة الدولة
+      if (filterCountry && user.country !== filterCountry) {
+        return false;
+      }
+
+      // فلترة الجهاز
+      if (filterDevice && user.device !== filterDevice) {
+        return false;
+      }
+
+      return true;
+    });
+  };
+
+  const filteredUsers = getFilteredUsers();
+
+  // الحصول على الدول الفريدة
+  const uniqueCountries = [...new Set(allUsers.map(u => u.country).filter(Boolean))];
+  
+  // الحصول على الأجهزة الفريدة
+  const uniqueDevices = [...new Set(allUsers.map(u => u.device).filter(Boolean))];
 
   if (!isAdmin) {
     return (
@@ -863,13 +935,74 @@ function AdminPanel({ isAdmin, currentUser }) {
       ) : viewMode === 'users' ? (
         <div className="users-section">
           <div className="section-header">
-            <h2><FaUserFriends /> كل المستخدمين ({allUsers.length})</h2>
+            <h2><FaUserFriends /> كل المستخدمين ({filteredUsers.length} من {allUsers.length})</h2>
             <button 
               className="refresh-btn"
               onClick={() => loadAllUsers()}
+              disabled={isLoading}
             >
-              🔄 تحديث
+              {isLoading ? '⏳' : '🔄'} تحديث
             </button>
+          </div>
+
+          {/* شريط البحث والفلاتر */}
+          <div className="filters-bar">
+            <div className="search-box">
+              <FaSearch className="search-icon" />
+              <input 
+                type="text"
+                placeholder="ابحث بالاسم أو الإيميل..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+            </div>
+
+            <select 
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">كل المستخدمين</option>
+              <option value="online">🟢 متصلون فقط</option>
+              <option value="offline">⚫ غير متصلين</option>
+            </select>
+
+            <select 
+              value={filterCountry}
+              onChange={(e) => setFilterCountry(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">كل الدول</option>
+              {uniqueCountries.map(country => (
+                <option key={country} value={country}>{translateToArabic(country)}</option>
+              ))}
+            </select>
+
+            <select 
+              value={filterDevice}
+              onChange={(e) => setFilterDevice(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">كل الأجهزة</option>
+              {uniqueDevices.map(device => (
+                <option key={device} value={device}>{translateToArabic(device)}</option>
+              ))}
+            </select>
+
+            {(searchTerm || filterCountry || filterDevice || filterStatus !== 'all') && (
+              <button 
+                className="clear-filters-btn"
+                onClick={() => {
+                  setSearchTerm('');
+                  setFilterCountry('');
+                  setFilterDevice('');
+                  setFilterStatus('all');
+                }}
+              >
+                ✕ إزالة الفلاتر
+              </button>
+            )}
           </div>
 
           <div className="users-table">
@@ -886,7 +1019,13 @@ function AdminPanel({ isAdmin, currentUser }) {
                 </tr>
               </thead>
               <tbody>
-                {allUsers.map(user => {
+                {filteredUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" style={{textAlign: 'center', padding: '40px', color: 'var(--text-secondary)'}}>
+                      {isLoading ? '⏳ جاري التحميل...' : '😕 لا توجد نتائج'}
+                    </td>
+                  </tr>
+                ) : filteredUsers.map(user => {
                   const isOnline = user.isOnline && user.lastSeen?.toDate && 
                     (Date.now() - user.lastSeen.toDate().getTime()) < 120000; // 2 دقائق
                   
@@ -895,7 +1034,7 @@ function AdminPanel({ isAdmin, currentUser }) {
                       <td>
                         <div className="user-cell">
                           {user.photoURL && (
-                            <img src={user.photoURL} alt="" className="user-avatar-small" />
+                            <img src={user.photoURL} alt="" className="user-avatar-small" loading="lazy" />
                           )}
                           <div>
                             <div className="user-name-small">
@@ -1131,7 +1270,7 @@ function AdminPanel({ isAdmin, currentUser }) {
                 />
                 {editData.imageUrl && (
                   <div className="image-preview">
-                    <img src={editData.imageUrl} alt="معاينة" onError={(e) => e.target.style.display = 'none'} />
+                    <img src={editData.imageUrl} alt="معاينة" onError={(e) => e.target.style.display = 'none'} loading="lazy" />
                   </div>
                 )}
               </div>
@@ -1223,7 +1362,7 @@ function AdminPanel({ isAdmin, currentUser }) {
                               <div key={v.id} className="listener-item">
                                 <div className="listener-avatar">
                                   {v.photoURL ? (
-                                    <img src={v.photoURL} alt={v.displayName} />
+                                    <img src={v.photoURL} alt={v.displayName} loading="lazy" />
                                   ) : (
                                     <div className="avatar-placeholder">
                                       {v.isAnonymous ? '👤' : '👤'}
@@ -1289,7 +1428,7 @@ function AdminPanel({ isAdmin, currentUser }) {
                     {/* الرأس */}
                     <div className="visitor-header">
                       {visitor.photoURL ? (
-                        <img src={visitor.photoURL} alt={visitor.displayName} className="visitor-avatar" />
+                        <img src={visitor.photoURL} alt={visitor.displayName} className="visitor-avatar" loading="lazy" />
                       ) : (
                         <div className="visitor-avatar-placeholder">
                           {visitor.isAnonymous ? '👤' : '👤'}
@@ -1515,7 +1654,7 @@ function AdminPanel({ isAdmin, currentUser }) {
                   {selectedUser.photoURL && (
                     <div className="detail-item">
                       <span className="label">الصورة:</span>
-                      <img src={selectedUser.photoURL} alt="صورة المستخدم" className="user-photo-large" />
+                      <img src={selectedUser.photoURL} alt="صورة المستخدم" className="user-photo-large" loading="lazy" />
                     </div>
                   )}
                 </div>
@@ -1645,6 +1784,20 @@ function AdminPanel({ isAdmin, currentUser }) {
           </div>
         </div>
       )}
+      
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   );
 }
